@@ -1,11 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme');
+    
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'color' ? 'dark' : 'color';
+        
+        if (newTheme === 'color') {
+            document.documentElement.setAttribute('data-theme', 'color');
+            localStorage.setItem('theme', 'color');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+    
     const navbar = document.querySelector('.navbar');
     
     window.addEventListener('scroll', () => {
+        const isColorTheme = document.documentElement.getAttribute('data-theme') === 'color';
         if (window.scrollY > 50) {
-            navbar.style.background = 'rgba(10, 10, 10, 0.95)';
+            navbar.style.background = isColorTheme ? 'rgba(248, 245, 241, 0.98)' : 'rgba(10, 10, 10, 0.95)';
         } else {
-            navbar.style.background = 'rgba(10, 10, 10, 0.8)';
+            navbar.style.background = isColorTheme ? 'rgba(248, 245, 241, 0.9)' : 'rgba(10, 10, 10, 0.8)';
         }
     });
     
@@ -57,6 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.skill-category').forEach((category, index) => {
         category.style.transitionDelay = `${index * 0.1}s`;
         itemObserver.observe(category);
+    });
+    
+    document.querySelectorAll('.interests-list li').forEach((item, index) => {
+        item.style.transitionDelay = `${index * 0.1}s`;
+        itemObserver.observe(item);
     });
     
     document.querySelectorAll('.education-item').forEach((item, index) => {
