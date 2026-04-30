@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Perez Matthieu // Développeur Junior // Admin Système Réseau </title>
+        <title>Perez Matthieu // Développeur Junior // Admin Système Réseau</title>
         <link rel="stylesheet" href="style.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,32 +14,43 @@
             <div class="nav-content">
                 <a href="#" class="logo">Portfolio.</a>
                 <div class="nav-links">
-                    <a href="#about">À propos</a>
-                    <a href="#experience">Expérience</a>
-                    <a href="#skills">Compétences</a>
-                    <a href="#contact">Contact</a>
+                    <a href="#about" data-i18n="nav.about">À propos</a>
+                    <a href="#experience" data-i18n="nav.experience">Expérience</a>
+                    <a href="#skills" data-i18n="nav.skills">Compétences</a>
+                    <a href="#contact" data-i18n="nav.contact">Contact</a>
                 </div>
-                <button class="theme-toggle" id="themeToggle" aria-label="Changer de thème">
-                    <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                    </svg>
-                    <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                    </svg>
-                </button>
+                <!-- Les contrôles globaux restent groupés pour simplifier l'UX dans la navbar. -->
+                <div class="nav-controls">
+                    <label class="language-switcher" for="languageSwitcher">
+                        <span class="sr-only">Langue</span>
+                        <select id="languageSwitcher" class="language-select" aria-label="Changer de langue">
+                            <option value="fr">Français</option>
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                        </select>
+                    </label>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Changer de thème">
+                        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </nav>
 
         <header class="hero">
             <div class="hero-content">
                 <h1>Perez Matthieu</h1>
-                <p class="subtitle">Développeur Junior // Administrateur Réseaux</p>
-                <p class="location">Paris, France</p>
+                <p class="subtitle" data-i18n="hero.subtitle">Développeur Junior // Administrateur Réseaux</p>
+                <p class="location" data-i18n="hero.location">Paris, France</p>
                 <div class="hero-links">
-                    <a href="https://github.com/Matt0967" target="_blank" class="btn">
+                    <a href="https://github.com/Matt0967" target="_blank" rel="noreferrer" class="btn">
                         GitHub
                     </a>
-                    <a href="https://linkedin.com/in/Matt0967" target="_blank" class="btn btn-secondary">
+                    <a href="https://linkedin.com/in/Matt0967" target="_blank" rel="noreferrer" class="btn btn-secondary">
                         LinkedIn
                     </a>
                 </div>
@@ -49,77 +60,78 @@
 
         <section id="about" class="section">
             <div class="container">
-                <h2 class="section-title">À propos</h2>
-                <p class="about-text">Mon approche architecte (INTJ-T) me pousse à trouver des solutions créatives et efficaces. J’aime apprendre, créer et construire des projets concrets.</p>
+                <h2 class="section-title" data-i18n="about.title">À propos</h2>
+                <p class="about-text" data-i18n="about.text">Mon approche architecte (INTJ-T) me pousse à trouver des solutions créatives et efficaces. J’aime apprendre, créer et construire des projets concrets.</p>
             </div>
         </section>
+
         <section id="experience" class="section">
             <div class="container">
-                <h2 class="section-title">Expérience</h2>
+                <h2 class="section-title" data-i18n="experience.title">Expérience</h2>
 
                 <div class="timeline">
                     <div class="timeline-item">
-                        <div class="timeline-date">Avr 2026 - Juin 2026</div>
+                        <div class="timeline-date" data-i18n="experience.items.oled.date">Avr 2026 - Juin 2026</div>
                         <div class="timeline-content">
-                            <h3>Module OLED programmable multifonction</h3>
-                            <p class="role">Développeur // Concepteur DIY</p>
-                            <p class="description">Création d’un module électronique pour Évaluer la puissance du réseau Wi-Fi et les fonctions de rappel.</p>
+                            <h3 data-i18n="experience.items.oled.title">Module OLED programmable multifonction</h3>
+                            <p class="role" data-i18n="experience.items.oled.role">Développeur // Concepteur DIY</p>
+                            <p class="description" data-i18n="experience.items.oled.description">Création d’un module électronique pour évaluer la puissance du réseau Wi-Fi et les fonctions de rappel.</p>
                             <div class="tech-stack">
                                 <span>Arduino</span>
                                 <span>C</span>
-                                <span>Soudure</span>
+                                <span data-i18n="skills.items.soldering">Soudure</span>
                             </div>
                         </div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-date">Jan 2026 - Mars 2026</div>
+                        <div class="timeline-date" data-i18n="experience.items.controller.date">Jan 2026 - Mars 2026</div>
                         <div class="timeline-content">
-                            <h3>Boîtier de commande à 6 touches</h3>
-                            <p class="role">Développeur // Concepteur DIY</p>
-                            <p class="description">Conception d’un contrôleur physique 6 touches Programmable</p>
+                            <h3 data-i18n="experience.items.controller.title">Boîtier de commande à 6 touches</h3>
+                            <p class="role" data-i18n="experience.items.controller.role">Développeur // Concepteur DIY</p>
+                            <p class="description" data-i18n="experience.items.controller.description">Conception d’un contrôleur physique 6 touches programmable.</p>
                             <div class="tech-stack">
                                 <span>Arduino</span>
                                 <span>C</span>
-                                <span>Soudure</span>
+                                <span data-i18n="skills.items.soldering">Soudure</span>
                             </div>
                         </div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-date">Nov 2025 - Déc 2025</div>
+                        <div class="timeline-date" data-i18n="experience.items.pomodoro.date">Nov 2025 - Déc 2025</div>
                         <div class="timeline-content">
-                            <h3>Système Pomodoro programmable</h3>
-                            <p class="role">Développeur // Concepteur DIY</p>
-                            <p class="description">Conception d'un système de gestion du temps basé sur la technique du Pomodoro.</p>
+                            <h3 data-i18n="experience.items.pomodoro.title">Système Pomodoro programmable</h3>
+                            <p class="role" data-i18n="experience.items.pomodoro.role">Développeur // Concepteur DIY</p>
+                            <p class="description" data-i18n="experience.items.pomodoro.description">Conception d'un système de gestion du temps basé sur la technique du Pomodoro.</p>
                             <div class="tech-stack">
                                 <span>Arduino</span>
                                 <span>C</span>
-                                <span>Soudure</span>
+                                <span data-i18n="skills.items.soldering">Soudure</span>
                             </div>
                         </div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-date">2023 - Present</div>
+                        <div class="timeline-date" data-i18n="experience.items.support.date">2023 - Présent</div>
                         <div class="timeline-content">
-                            <h3>Assistance informatique</h3>
-                            <p class="role">Support technique</p>
-                            <p class="description">Installation et configuration de logiciels, résolution de problèmes simples, aide technique auprès de personnes.</p>
+                            <h3 data-i18n="experience.items.support.title">Assistance informatique</h3>
+                            <p class="role" data-i18n="experience.items.support.role">Support technique</p>
+                            <p class="description" data-i18n="experience.items.support.description">Installation et configuration de logiciels, résolution de problèmes simples, aide technique auprès de personnes.</p>
                             <div class="tech-stack">
                                 <span>Windows</span>
                                 <span>Linux</span>
-                                <span>Support utilisateur</span>
+                                <span data-i18n="skills.items.userSupport">Support utilisateur</span>
                             </div>
                         </div>
                     </div>
                     <div class="timeline-item">
-                        <div class="timeline-date">2023 - Present</div>
+                        <div class="timeline-date" data-i18n="experience.items.organization.date">2023 - Présent</div>
                         <div class="timeline-content">
-                            <h3>Organisation numérique</h3>
-                            <p class="role">Organisation</p>
-                            <p class="description">Création d'un système de gestion de tâches, planification, structure et études, optimisation des méthodes de travail.</p>
+                            <h3 data-i18n="experience.items.organization.title">Organisation numérique</h3>
+                            <p class="role" data-i18n="experience.items.organization.role">Organisation</p>
+                            <p class="description" data-i18n="experience.items.organization.description">Création d'un système de gestion de tâches, planification, structure et études, optimisation des méthodes de travail.</p>
                             <div class="tech-stack">
-                                <span>Gestion de projet</span>
-                                <span>Planification</span>
-                                <span>Optimisation</span>
+                                <span data-i18n="skills.items.projectManagement">Gestion de projet</span>
+                                <span data-i18n="skills.items.planning">Planification</span>
+                                <span data-i18n="skills.items.optimization">Optimisation</span>
                             </div>
                         </div>
                     </div>
@@ -129,11 +141,11 @@
 
         <section id="skills" class="section">
             <div class="container">
-                <h2 class="section-title">Compétences</h2>
+                <h2 class="section-title" data-i18n="skills.title">Compétences</h2>
 
                 <div class="skills-grid">
                     <div class="skill-category">
-                        <h3>Langages</h3>
+                        <h3 data-i18n="skills.categories.languages">Langages</h3>
                         <ul>
                             <li>HTML</li>
                             <li>CSS</li>
@@ -143,11 +155,11 @@
                         </ul>
                     </div>
                     <div class="skill-category">
-                        <h3>Système d'information // Serveur</h3>
+                        <h3 data-i18n="skills.categories.systems">Système d'information // Serveur</h3>
                         <ul>
-                            <li>Windows Serveur</li>
-                            <li>yunohost Serveur</li>
-                            <li>Linux Serveur</li>
+                            <li data-i18n="skills.items.windowsServer">Windows Serveur</li>
+                            <li data-i18n="skills.items.yunohostServer">yunohost Serveur</li>
+                            <li data-i18n="skills.items.linuxServer">Linux Serveur</li>
                             <li>Docker</li>
                             <li>API</li>
                             <li>CLI</li>
@@ -156,13 +168,13 @@
                         </ul>
                     </div>
                     <div class="skill-category">
-                        <h3>Compétences physiques</h3>
+                        <h3 data-i18n="skills.categories.physical">Compétences physiques</h3>
                         <ul>
-                            <li>Soudure</li>
-                            <li>Création de machines</li>
-                            <li>Gestion de machines virtuelles</li>
-                            <li>Diagnostic de machine physique</li>
-                            <li>Montage de PC</li>
+                            <li data-i18n="skills.items.soldering">Soudure</li>
+                            <li data-i18n="skills.items.machineBuilding">Création de machines</li>
+                            <li data-i18n="skills.items.vmManagement">Gestion de machines virtuelles</li>
+                            <li data-i18n="skills.items.hardwareDiagnostics">Diagnostic de machine physique</li>
+                            <li data-i18n="skills.items.pcAssembly">Montage de PC</li>
                         </ul>
                     </div>
                 </div>
@@ -171,43 +183,45 @@
 
         <section id="interests" class="section">
             <div class="container">
-                <h2 class="section-title">Centres d'intérêt</h2>
+                <h2 class="section-title" data-i18n="interests.title">Centres d'intérêt</h2>
                 <ul class="interests-list">
-                    <li>Électronique et Arduino</li>
-                    <li>Modélisation et impression 3D</li>
-                    <li>Bricolage et création DIY</li>
-                    <li>Informatique et hardware</li>
-                    <li>Électronique appliquée</li>
-                    <li>sciences Cognitives</li>
-                    <li>histoire et culture générale</li>
+                    <li data-i18n="interests.items.electronics">Électronique et Arduino</li>
+                    <li data-i18n="interests.items.printing">Modélisation et impression 3D</li>
+                    <li data-i18n="interests.items.diy">Bricolage et création DIY</li>
+                    <li data-i18n="interests.items.hardware">Informatique et hardware</li>
+                    <li data-i18n="interests.items.appliedElectronics">Électronique appliquée</li>
+                    <li data-i18n="interests.items.cognition">Sciences cognitives</li>
+                    <li data-i18n="interests.items.history">Histoire et culture générale</li>
                 </ul>
             </div>
         </section>
+
         <section id="education" class="section">
             <div class="container">
-            <h2 class="section-title">Formation - Éducation</h2>
+                <h2 class="section-title" data-i18n="education.title">Formation - Éducation</h2>
 
-            <div class="education-list">
-                <div class="education-item">
-                    <h3>École primaire</h3>
-                    <p class="school">Mariette Delahaute.</p>
-                    <p class="year">2017 - 2022</p>
-                </div>
                 <div class="education-list">
                     <div class="education-item">
-                        <h3>École secondaire</h3>
-                        <p class="school">Centre scolaire à Asty-Moulin</p>
-                        <p class="year">2022 - 2025</p>
+                        <h3 data-i18n="education.items.primary.title">École primaire</h3>
+                        <p class="school" data-i18n="education.items.primary.school">Mariette Delahaute.</p>
+                        <p class="year">2017 - 2022</p>
                     </div>
-                    <div class="education-item">
-                        <h3>Arduino ET DIY</h3>
-                        <p class="school">Formation, distanciel, Arduino et composants électroniques.</p>
-                        <p class="year">2025 - 2026</p>
-                    </div>
-                    <div class="education-item">
-                        <h3>Modélisation 3D</h3>
-                        <p class="school">Formation en distanciel. Modélisation et impression 3D</p>
-                        <p class="year">2025 - 2026</p>
+                    <div class="education-list">
+                        <div class="education-item">
+                            <h3 data-i18n="education.items.secondary.title">École secondaire</h3>
+                            <p class="school" data-i18n="education.items.secondary.school">Centre scolaire à Asty-Moulin</p>
+                            <p class="year">2022 - 2025</p>
+                        </div>
+                        <div class="education-item">
+                            <h3 data-i18n="education.items.arduino.title">Arduino et DIY</h3>
+                            <p class="school" data-i18n="education.items.arduino.school">Formation à distance en Arduino et composants électroniques.</p>
+                            <p class="year">2025 - 2026</p>
+                        </div>
+                        <div class="education-item">
+                            <h3 data-i18n="education.items.modeling.title">Modélisation 3D</h3>
+                            <p class="school" data-i18n="education.items.modeling.school">Formation à distance en modélisation et impression 3D.</p>
+                            <p class="year">2025 - 2026</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -215,18 +229,27 @@
 
         <section id="languages" class="section">
             <div class="container">
-                <h2 class="section-title">Langues</h2>
+                <h2 class="section-title" data-i18n="languages.title">Langues</h2>
                 <div class="languages">
-                    <span class="language"><strong>Français</strong> - Natif</span>
-                    <span class="language"><strong>Anglais</strong> - A2</span>
-                    <span class="language"><strong>Espagnol</strong> - A2</span>
+                    <span class="language">
+                        <strong data-i18n="languages.items.french.label">Français</strong>
+                        <span data-i18n="languages.items.french.level"> - Natif</span>
+                    </span>
+                    <span class="language">
+                        <strong data-i18n="languages.items.english.label">Anglais</strong>
+                        <span data-i18n="languages.items.english.level"> - A2</span>
+                    </span>
+                    <span class="language">
+                        <strong data-i18n="languages.items.spanish.label">Espagnol</strong>
+                        <span data-i18n="languages.items.spanish.level"> - A2</span>
+                    </span>
                 </div>
             </div>
         </section>
 
         <section id="contact" class="section contact-section">
             <div class="container">
-                <h2 class="section-title">Contact</h2>
+                <h2 class="section-title" data-i18n="contact.title">Contact</h2>
                 <div class="contact-links">
                     <a href="mailto:thomas.perrono@gmail.com" class="contact-item">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -234,14 +257,14 @@
                     </a>
                     <a href="tel:+33658117393" class="contact-item">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        07 44 47 23 85
+                        +33 07 44 47 23 85
                     </a>
                 </div>
             </div>
         </section>
 
         <footer>
-            <p>© 2025 Perez Matthieu // Développeur.</p>
+            <p data-i18n="footer.copy">© 2025 Perez Matthieu // Développeur.</p>
         </footer>
 
         <script src="script.js"></script>
