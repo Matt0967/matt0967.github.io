@@ -292,5 +292,18 @@
         "es": "A2"
       }
     }
-  ]
+  ],
+  "contact": {
+    "notionFormUrl": "https://quick-sunspot-e60.notion.site/3610fbf9c2618016b365e7357e99c696?pvs=105",
+    "iframeTitle": {
+      "fr": "Formulaire de contact Notion",
+      "en": "Notion contact form",
+      "es": "Formulario de contacto Notion"
+    },
+    "openLabel": {
+      "fr": "Ouvrir le formulaire Notion",
+      "en": "Open the Notion form",
+      "es": "Abrir el formulario de Notion"
+    }
+  }
 }
