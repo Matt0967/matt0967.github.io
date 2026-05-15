@@ -6,7 +6,14 @@ Le site reste compatible GitHub Pages: il n'y a pas de backend.
 
 1. Ouvre `admin.html`.
 2. Modifie les projets, les compétences ou les langues.
-3. Sauvegarde en brouillon local, télécharge `portfolio-data.json`, ou publie directement via l'onglet `Publication`.
+3. Dans `Contact`, colle l'URL publique de ton formulaire Notion.
+4. Sauvegarde en brouillon local, télécharge `portfolio-data.json`, ou publie directement via l'onglet `Publication`.
+
+## Contact Notion
+
+Le formulaire de contact utilise une URL de formulaire Notion public. Ne mets pas de token Notion dans le site: avec GitHub Pages, il serait exposé côté navigateur.
+
+Dans Notion, crée un formulaire relié à la base où tu veux recevoir tes demandes, puis règle le partage sur `Anyone on the web with link`. Copie l'URL du formulaire dans l'onglet `Contact` du dashboard.
 
 ## Publication GitHub
 

@@ -96,12 +96,13 @@ function updateCounts() {
     document.getElementById('projectCount').textContent = state.data?.projects?.length || 0;
     document.getElementById('skillCount').textContent = state.data?.skills?.length || 0;
     document.getElementById('languageCount').textContent = state.data?.languages?.length || 0;
+    document.getElementById('contactStatus').textContent = state.data?.contact?.notionFormUrl ? 'Oui' : 'Non';
 }
 
 function renderLocalizedInputs(record, key, label, multiline = false) {
     return LOCALES.map((locale) => {
         const value = getLocalizedValue(record[key], locale);
-        const inputId = `${record.id}-${key}-${locale}`;
+        const inputId = `${record.id || 'settings'}-${key}-${locale}`;
         const field = document.createElement('div');
         field.className = multiline ? 'field full' : 'field';
 
@@ -287,6 +288,60 @@ function renderLanguages() {
     });
 }
 
+function renderContactSettings() {
+    state.data.contact = state.data.contact || {
+        notionFormUrl: '',
+        iframeTitle: emptyLocalizedValue(),
+        openLabel: emptyLocalizedValue()
+    };
+
+    tabEyebrow.textContent = 'Notion';
+    tabTitle.textContent = 'Formulaire de contact';
+    addButton.hidden = true;
+    editor.replaceChildren();
+
+    const panel = document.createElement('section');
+    panel.className = 'publish-panel';
+
+    const intro = document.createElement('p');
+    intro.className = 'dashboard-note';
+    intro.textContent = 'Utilise une URL de formulaire Notion public. Ne mets pas de token Notion ici: sur GitHub Pages, un token serait visible côté navigateur.';
+
+    const body = document.createElement('div');
+    body.className = 'field-grid';
+
+    const urlField = document.createElement('div');
+    urlField.className = 'field full';
+    const urlLabel = document.createElement('label');
+    urlLabel.setAttribute('for', 'notionFormUrl');
+    urlLabel.textContent = 'URL publique du formulaire Notion';
+    const urlInput = document.createElement('input');
+    urlInput.id = 'notionFormUrl';
+    urlInput.type = 'url';
+    urlInput.placeholder = 'https://www.notion.so/forms/...';
+    urlInput.value = state.data.contact.notionFormUrl || '';
+    urlInput.addEventListener('input', () => {
+        state.data.contact.notionFormUrl = urlInput.value.trim();
+        updateCounts();
+    });
+    urlField.append(urlLabel, urlInput);
+    body.append(urlField);
+
+    renderLocalizedInputs(state.data.contact, 'iframeTitle', 'Titre iframe').forEach((field) => body.append(field));
+    renderLocalizedInputs(state.data.contact, 'openLabel', 'Lien de secours').forEach((field) => body.append(field));
+
+    const actions = document.createElement('div');
+    actions.className = 'toolbar-actions';
+    actions.append(createButton('Ouvrir le formulaire', 'secondary-button', () => {
+        if (state.data.contact.notionFormUrl) {
+            window.open(state.data.contact.notionFormUrl, '_blank', 'noreferrer');
+        }
+    }));
+
+    panel.append(intro, body, actions);
+    editor.append(panel);
+}
+
 function renderPublish() {
     const savedConfig = JSON.parse(localStorage.getItem(GITHUB_CONFIG_KEY) || '{}');
     tabEyebrow.textContent = 'GitHub Pages';
@@ -358,6 +413,7 @@ function render() {
         projects: renderProjects,
         skills: renderSkills,
         languages: renderLanguages,
+        contact: renderContactSettings,
         publish: renderPublish
     };
 
@@ -428,7 +484,12 @@ function normalizeData(data) {
         schemaVersion: data.schemaVersion || 1,
         projects: Array.isArray(data.projects) ? data.projects : [],
         skills: Array.isArray(data.skills) ? data.skills : [],
-        languages: Array.isArray(data.languages) ? data.languages : []
+        languages: Array.isArray(data.languages) ? data.languages : [],
+        contact: data.contact && typeof data.contact === 'object' ? data.contact : {
+            notionFormUrl: '',
+            iframeTitle: emptyLocalizedValue(),
+            openLabel: emptyLocalizedValue()
+        }
     };
 }
 

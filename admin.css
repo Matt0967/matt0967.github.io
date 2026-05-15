@@ -209,6 +209,10 @@ h1 {
     background: rgba(15, 19, 24, 0.88);
 }
 
+.dashboard-note {
+    color: var(--text-soft);
+}
+
 code {
     color: var(--accent);
 }

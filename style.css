@@ -788,46 +788,40 @@ a {
     border-bottom: 1px solid var(--border);
 }
 
-.contact-links {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.contact-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--text-secondary);
-    font-size: 1.125rem;
-    transition: all 0.3s ease;
-    padding: 1rem;
+.contact-form-card {
+    overflow: hidden;
+    min-height: 28rem;
     background: var(--bg-secondary);
-    border-radius: 12px;
     border: 1px solid var(--border);
+    border-radius: 8px;
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateY(20px);
+    transition: all 0.6s ease-out;
 }
 
-.contact-item.visible {
+.contact-form-card.visible {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
 }
 
-.contact-item:hover {
+.notion-form-frame {
+    display: block;
+    width: 100%;
+    min-height: 42rem;
+    border: 0;
+    background: var(--bg-secondary);
+}
+
+.contact-form-fallback,
+.contact-form-placeholder {
+    display: block;
+    padding: 1rem;
+    color: var(--text-secondary);
+}
+
+.contact-form-fallback {
+    border-top: 1px solid var(--border);
     color: var(--accent);
-    border-color: var(--accent);
-    transform: translateX(10px);
-    box-shadow: 0 5px 20px rgba(var(--accent-rgb), 0.2);
-}
-
-.contact-item svg {
-    color: var(--accent);
-    transition: transform 0.3s ease;
-}
-
-.contact-item:hover svg {
-    transform: scale(1.2);
 }
 
 /* Footer */

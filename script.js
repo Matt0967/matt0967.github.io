@@ -127,7 +127,8 @@ const translations = {
             }
         },
         contact: {
-            title: "Contact"
+            title: "Contact",
+            formPlaceholder: "Formulaire Notion à configurer."
         },
         footer: {
             copy: "© 2025 Perez Matthieu // Développeur."
@@ -261,7 +262,8 @@ const translations = {
             }
         },
         contact: {
-            title: "Contact"
+            title: "Contact",
+            formPlaceholder: "Notion form to configure."
         },
         footer: {
             copy: "© 2025 Perez Matthieu // Developer."
@@ -395,7 +397,8 @@ const translations = {
             }
         },
         contact: {
-            title: "Contacto"
+            title: "Contacto",
+            formPlaceholder: "Formulario de Notion por configurar."
         },
         footer: {
             copy: "© 2025 Perez Matthieu // Desarrollador."
@@ -518,10 +521,51 @@ function renderLanguages(language) {
     });
 }
 
+function renderContact(language) {
+    const contactMount = document.getElementById('contactFormMount');
+
+    if (!contactMount) {
+        return;
+    }
+
+    const formUrl = portfolioData?.contact?.notionFormUrl?.trim();
+    contactMount.replaceChildren();
+
+    if (!formUrl) {
+        contactMount.append(createTextElement('p', 'contact-form-placeholder', translations[language]?.contact?.formPlaceholder || translations.fr.contact.formPlaceholder));
+        return;
+    }
+
+    try {
+        const url = new URL(formUrl);
+
+        if (url.protocol !== 'https:') {
+            throw new Error('Only HTTPS form URLs are supported.');
+        }
+
+        const iframe = document.createElement('iframe');
+        iframe.className = 'notion-form-frame';
+        iframe.src = url.href;
+        iframe.title = getLocalizedValue(portfolioData.contact?.iframeTitle, language) || 'Notion contact form';
+        iframe.loading = 'lazy';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+
+        const fallbackLink = createTextElement('a', 'contact-form-fallback', getLocalizedValue(portfolioData.contact?.openLabel, language) || 'Ouvrir le formulaire Notion');
+        fallbackLink.href = url.href;
+        fallbackLink.target = '_blank';
+        fallbackLink.rel = 'noreferrer';
+
+        contactMount.append(iframe, fallbackLink);
+    } catch (error) {
+        contactMount.append(createTextElement('p', 'contact-form-placeholder', translations[language]?.contact?.formPlaceholder || translations.fr.contact.formPlaceholder));
+    }
+}
+
 function renderPortfolioSections(language) {
     renderProjects(language);
     renderSkills(language);
     renderLanguages(language);
+    renderContact(language);
 }
 
 async function loadPortfolioData() {
@@ -598,7 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { selector: '.interests-list li', delay: 100 },
             { selector: '.education-item', delay: 150 },
             { selector: '.language', delay: 100 },
-            { selector: '.contact-item', delay: 150 }
+            { selector: '.contact-form-card', delay: 150 }
         ];
 
         animatedGroups.forEach(({ selector, delay }) => {
