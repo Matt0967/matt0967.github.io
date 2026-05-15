@@ -256,9 +256,9 @@
     {
       "id": "french",
       "label": {
-          "fr": "Français",
+        "fr": "Français",
         "en": "French",
-          "es": "Francés"
+        "es": "Francés"
       },
       "level": {
         "fr": "Natif",
@@ -271,7 +271,7 @@
       "label": {
         "fr": "Anglais",
         "en": "English",
-          "es": "Inglés"
+        "es": "Inglés"
       },
       "level": {
         "fr": "A2",
@@ -284,7 +284,7 @@
       "label": {
         "fr": "Espagnol",
         "en": "Spanish",
-          "es": "Español"
+        "es": "Español"
       },
       "level": {
         "fr": "A2",
@@ -294,7 +294,11 @@
     }
   ],
   "contact": {
+<<<<<<< HEAD
     "notionFormUrl": "",
+=======
+    "notionFormUrl": "https://quick-sunspot-e60.notion.site/3610fbf9c2618016b365e7357e99c696?pvs=105",
+>>>>>>> origin/main
     "iframeTitle": {
       "fr": "Formulaire de contact Notion",
       "en": "Notion contact form",
