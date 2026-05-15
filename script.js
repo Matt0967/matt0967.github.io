@@ -407,10 +407,142 @@ function getNestedValue(object, path) {
     return path.split('.').reduce((currentValue, key) => currentValue?.[key], object);
 }
 
+let portfolioData = null;
+
+function getLocalizedValue(value, language) {
+    if (typeof value === 'string') {
+        return value;
+    }
+
+    if (value && typeof value === 'object') {
+        return value[language] || value.fr || value.en || Object.values(value)[0] || '';
+    }
+
+    return '';
+}
+
+function createTextElement(tagName, className, text) {
+    const element = document.createElement(tagName);
+
+    if (className) {
+        element.className = className;
+    }
+
+    element.textContent = text;
+    return element;
+}
+
+function renderProjects(language) {
+    const timeline = document.querySelector('#experience .timeline');
+
+    if (!timeline || !portfolioData?.projects?.length) {
+        return;
+    }
+
+    timeline.replaceChildren();
+
+    portfolioData.projects.forEach((project) => {
+        const item = document.createElement('div');
+        item.className = 'timeline-item';
+
+        const date = createTextElement('div', 'timeline-date', getLocalizedValue(project.date, language));
+        const content = document.createElement('div');
+        content.className = 'timeline-content';
+
+        content.append(
+            createTextElement('h3', '', getLocalizedValue(project.title, language)),
+            createTextElement('p', 'role', getLocalizedValue(project.role, language)),
+            createTextElement('p', 'description', getLocalizedValue(project.description, language))
+        );
+
+        if (project.tech?.length) {
+            const techStack = document.createElement('div');
+            techStack.className = 'tech-stack';
+
+            project.tech.forEach((tech) => {
+                techStack.append(createTextElement('span', '', getLocalizedValue(tech, language)));
+            });
+
+            content.append(techStack);
+        }
+
+        item.append(date, content);
+        timeline.append(item);
+    });
+}
+
+function renderSkills(language) {
+    const skillsGrid = document.querySelector('#skills .skills-grid');
+
+    if (!skillsGrid || !portfolioData?.skills?.length) {
+        return;
+    }
+
+    skillsGrid.replaceChildren();
+
+    portfolioData.skills.forEach((category) => {
+        const categoryElement = document.createElement('div');
+        categoryElement.className = 'skill-category';
+        categoryElement.append(createTextElement('h3', '', getLocalizedValue(category.title, language)));
+
+        const list = document.createElement('ul');
+
+        category.items?.forEach((skill) => {
+            list.append(createTextElement('li', '', getLocalizedValue(skill, language)));
+        });
+
+        categoryElement.append(list);
+        skillsGrid.append(categoryElement);
+    });
+}
+
+function renderLanguages(language) {
+    const languagesContainer = document.querySelector('#languages .languages');
+
+    if (!languagesContainer || !portfolioData?.languages?.length) {
+        return;
+    }
+
+    languagesContainer.replaceChildren();
+
+    portfolioData.languages.forEach((spokenLanguage) => {
+        const wrapper = document.createElement('span');
+        wrapper.className = 'language';
+
+        wrapper.append(
+            createTextElement('strong', '', getLocalizedValue(spokenLanguage.label, language)),
+            createTextElement('span', '', ` - ${getLocalizedValue(spokenLanguage.level, language)}`)
+        );
+
+        languagesContainer.append(wrapper);
+    });
+}
+
+function renderPortfolioSections(language) {
+    renderProjects(language);
+    renderSkills(language);
+    renderLanguages(language);
+}
+
+async function loadPortfolioData() {
+    try {
+        const response = await fetch('portfolio-data.json', { cache: 'no-cache' });
+
+        if (!response.ok) {
+            throw new Error(`portfolio-data.json returned ${response.status}`);
+        }
+
+        portfolioData = await response.json();
+    } catch (error) {
+        console.warn('Impossible de charger portfolio-data.json. Le contenu HTML statique reste affiché.', error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('themeToggle');
     const languageSwitcher = document.getElementById('languageSwitcher');
     const navbar = document.querySelector('.navbar');
+    let itemObserver = null;
 
     function updateNavbarBackground() {
         const rootStyles = getComputedStyle(document.documentElement);
@@ -451,6 +583,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         languageSwitcher.value = selectedLanguage;
         localStorage.setItem('language', selectedLanguage);
+        renderPortfolioSections(selectedLanguage);
+        observeAnimatedItems();
+    }
+
+    function observeAnimatedItems() {
+        if (!itemObserver) {
+            return;
+        }
+
+        const animatedGroups = [
+            { selector: '.timeline-item', delay: 100 },
+            { selector: '.skill-category', delay: 100 },
+            { selector: '.interests-list li', delay: 100 },
+            { selector: '.education-item', delay: 150 },
+            { selector: '.language', delay: 100 },
+            { selector: '.contact-item', delay: 150 }
+        ];
+
+        animatedGroups.forEach(({ selector, delay }) => {
+            document.querySelectorAll(selector).forEach((element, index) => {
+                element.style.transitionDelay = `${index * (delay / 1000)}s`;
+                itemObserver.observe(element);
+
+                if (element.closest('.section.visible')) {
+                    element.classList.add('visible');
+                }
+            });
+        });
     }
 
     const savedTheme = localStorage.getItem('theme');
@@ -458,6 +618,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     applyTheme(savedTheme === 'color' ? 'color' : 'dark');
     applyLanguage(savedLanguage || 'fr');
+    loadPortfolioData().then(() => {
+        applyLanguage(localStorage.getItem('language') || savedLanguage || 'fr');
+    });
 
     themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -502,7 +665,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionObserver.observe(section);
     });
 
-    const itemObserver = new IntersectionObserver((entries) => {
+    itemObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry, index) => {
             if (entry.isIntersecting) {
                 setTimeout(() => {
@@ -512,34 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, observerOptions);
 
-    document.querySelectorAll('.timeline-item').forEach((item) => {
-        itemObserver.observe(item);
-    });
-
-    document.querySelectorAll('.skill-category').forEach((category, index) => {
-        category.style.transitionDelay = `${index * 0.1}s`;
-        itemObserver.observe(category);
-    });
-
-    document.querySelectorAll('.interests-list li').forEach((item, index) => {
-        item.style.transitionDelay = `${index * 0.1}s`;
-        itemObserver.observe(item);
-    });
-
-    document.querySelectorAll('.education-item').forEach((item, index) => {
-        item.style.transitionDelay = `${index * 0.15}s`;
-        itemObserver.observe(item);
-    });
-
-    document.querySelectorAll('.language').forEach((languageItem, index) => {
-        languageItem.style.transitionDelay = `${index * 0.1}s`;
-        itemObserver.observe(languageItem);
-    });
-
-    document.querySelectorAll('.contact-item').forEach((item, index) => {
-        item.style.transitionDelay = `${index * 0.15}s`;
-        itemObserver.observe(item);
-    });
+    observeAnimatedItems();
 
     const heroContent = document.querySelector('.hero-content');
     heroContent.style.opacity = '1';

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex, nofollow">
+        <title>Dashboard admin // Portfolio</title>
+        <link rel="stylesheet" href="admin.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header class="admin-header">
+            <div>
+                <a class="back-link" href="index.html">Retour au CV</a>
+                <h1>Dashboard admin</h1>
+                <p>Édition statique compatible GitHub Pages. La publication demande un token GitHub personnel.</p>
+            </div>
+            <div class="header-actions">
+                <button class="ghost-button" type="button" id="importButton">Importer JSON</button>
+                <button class="ghost-button" type="button" id="downloadButton">Télécharger JSON</button>
+                <button class="primary-button" type="button" id="saveDraftButton">Sauver le brouillon</button>
+            </div>
+        </header>
+
+        <main class="admin-shell">
+            <aside class="sidebar">
+                <div class="status-panel">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Chargement des données...</span>
+                </div>
+                <nav class="tabs" aria-label="Sections du dashboard">
+                    <button class="tab is-active" type="button" data-tab="projects">Projets</button>
+                    <button class="tab" type="button" data-tab="skills">Compétences</button>
+                    <button class="tab" type="button" data-tab="languages">Langues</button>
+                    <button class="tab" type="button" data-tab="publish">Publication</button>
+                </nav>
+                <div class="meta-panel">
+                    <span><strong id="projectCount">0</strong> projets</span>
+                    <span><strong id="skillCount">0</strong> catégories</span>
+                    <span><strong id="languageCount">0</strong> langues</span>
+                </div>
+            </aside>
+
+            <section class="workspace">
+                <div class="toolbar">
+                    <div>
+                        <p class="eyebrow" id="tabEyebrow">Contenu</p>
+                        <h2 id="tabTitle">Projets</h2>
+                    </div>
+                    <button class="secondary-button" type="button" id="addButton">Ajouter</button>
+                </div>
+
+                <div class="notice">
+                    Le fichier <code>admin.html</code> est visible si quelqu'un connaît son URL. La vraie protection vient du token GitHub: sans lui, personne ne peut publier dans ton dépôt.
+                </div>
+
+                <div id="editor"></div>
+            </section>
+        </main>
+
+        <input type="file" id="jsonFileInput" accept="application/json,.json" hidden>
+        <script src="admin.js"></script>
+    </body>
+</html>
