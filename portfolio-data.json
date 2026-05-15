@@ -294,11 +294,7 @@
     }
   ],
   "contact": {
-<<<<<<< HEAD
-    "notionFormUrl": "",
-=======
     "notionFormUrl": "https://quick-sunspot-e60.notion.site/3610fbf9c2618016b365e7357e99c696?pvs=105",
->>>>>>> origin/main
     "iframeTitle": {
       "fr": "Formulaire de contact Notion",
       "en": "Notion contact form",
