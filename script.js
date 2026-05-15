@@ -543,19 +543,13 @@ function renderContact(language) {
             throw new Error('Only HTTPS form URLs are supported.');
         }
 
-        const iframe = document.createElement('iframe');
-        iframe.className = 'notion-form-frame';
-        iframe.src = url.href;
-        iframe.title = getLocalizedValue(portfolioData.contact?.iframeTitle, language) || 'Notion contact form';
-        iframe.loading = 'lazy';
-        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        const title = createTextElement('p', 'contact-form-heading', getLocalizedValue(portfolioData.contact?.iframeTitle, language) || 'Formulaire de contact Notion');
+        const actionLink = createTextElement('a', 'contact-form-action', getLocalizedValue(portfolioData.contact?.openLabel, language) || 'Ouvrir le formulaire Notion');
+        actionLink.href = url.href;
+        actionLink.target = '_blank';
+        actionLink.rel = 'noopener noreferrer';
 
-        const fallbackLink = createTextElement('a', 'contact-form-fallback', getLocalizedValue(portfolioData.contact?.openLabel, language) || 'Ouvrir le formulaire Notion');
-        fallbackLink.href = url.href;
-        fallbackLink.target = '_blank';
-        fallbackLink.rel = 'noreferrer';
-
-        contactMount.append(iframe, fallbackLink);
+        contactMount.append(title, actionLink);
     } catch (error) {
         contactMount.append(createTextElement('p', 'contact-form-placeholder', translations[language]?.contact?.formPlaceholder || translations.fr.contact.formPlaceholder));
     }
