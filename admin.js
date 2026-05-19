@@ -355,30 +355,37 @@ function renderPublish() {
         <div class="publish-grid">
             <div class="field">
                 <label for="githubOwner">Propriétaire GitHub</label>
-                <input id="githubOwner" value="${savedConfig.owner || 'Matt0967'}" autocomplete="username">
+                <input id="githubOwner" autocomplete="username">
             </div>
             <div class="field">
                 <label for="githubRepo">Dépôt</label>
-                <input id="githubRepo" value="${savedConfig.repo || 'portefolio'}">
+                <input id="githubRepo">
             </div>
             <div class="field">
                 <label for="githubBranch">Branche</label>
-                <input id="githubBranch" value="${savedConfig.branch || 'main'}">
+                <input id="githubBranch">
             </div>
             <div class="field">
                 <label for="githubPath">Fichier à publier</label>
-                <input id="githubPath" value="${savedConfig.path || DATA_PATH}">
+                <input id="githubPath">
             </div>
             <div class="field full">
                 <label for="githubToken">Token GitHub personnel</label>
-                <input id="githubToken" type="password" value="${localStorage.getItem(GITHUB_TOKEN_KEY) || ''}" autocomplete="off">
+                <input id="githubToken" type="password" autocomplete="off">
             </div>
             <label class="checkbox-row field full">
-                <input id="rememberToken" type="checkbox" ${localStorage.getItem(GITHUB_TOKEN_KEY) ? 'checked' : ''}>
+                <input id="rememberToken" type="checkbox">
                 Garder le token dans ce navigateur
             </label>
         </div>
     `;
+
+    panel.querySelector('#githubOwner').value = savedConfig.owner || 'Matt0967';
+    panel.querySelector('#githubRepo').value = savedConfig.repo || 'portefolio';
+    panel.querySelector('#githubBranch').value = savedConfig.branch || 'main';
+    panel.querySelector('#githubPath').value = savedConfig.path || DATA_PATH;
+    panel.querySelector('#githubToken').value = localStorage.getItem(GITHUB_TOKEN_KEY) || '';
+    panel.querySelector('#rememberToken').checked = Boolean(localStorage.getItem(GITHUB_TOKEN_KEY));
 
     const actions = document.createElement('div');
     actions.className = 'toolbar-actions';
