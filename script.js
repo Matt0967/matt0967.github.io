@@ -438,7 +438,7 @@ function createTextElement(tagName, className, text) {
 function renderProjects(language) {
     const timeline = document.querySelector('#experience .timeline');
 
-    if (!timeline || !portfolioData?.projects?.length) {
+    if (!timeline || !Array.isArray(portfolioData?.projects)) {
         return;
     }
 
@@ -477,7 +477,7 @@ function renderProjects(language) {
 function renderSkills(language) {
     const skillsGrid = document.querySelector('#skills .skills-grid');
 
-    if (!skillsGrid || !portfolioData?.skills?.length) {
+    if (!skillsGrid || !Array.isArray(portfolioData?.skills)) {
         return;
     }
 
