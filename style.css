@@ -1,23 +1,30 @@
 :root {
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #141414;
-    --bg-tertiary: #1f1f1f;
+    --bg-primary: #07131f;
+    --bg-secondary: #0d1b2a;
+    --bg-tertiary: #13263a;
     --text-primary: #ffffff;
-    --text-secondary: #a3a3a3;
-    --text-muted: #737373;
+    --text-secondary: #b4c2ce;
+    --text-muted: #7f8f9e;
     --accent: #22c55e;
     --accent-rgb: 34, 197, 94;
     --accent-hover: #16a34a;
-    --border: #262626;
+    --border: #1e3448;
     --font-family: 'JetBrains Mono', monospace;
-    --section-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(10, 10, 10, 0.16) 100%);
-    --section-alt-bg: linear-gradient(180deg, rgba(34, 197, 94, 0.04) 0%, rgba(10, 10, 10, 0) 100%);
+    --section-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(7, 19, 31, 0.18) 100%);
+    --section-alt-bg: linear-gradient(180deg, rgba(34, 197, 94, 0.05) 0%, rgba(7, 19, 31, 0) 100%);
     --theme-glow-primary: rgba(34, 197, 94, 0.16);
     --theme-glow-secondary: rgba(34, 197, 94, 0.11);
     --theme-glow-soft: rgba(34, 197, 94, 0.05);
     --theme-sheen: rgba(34, 197, 94, 0.04);
-    --navbar-bg: rgba(10, 10, 10, 0.8);
-    --navbar-bg-scrolled: rgba(10, 10, 10, 0.95);
+    --navbar-bg: rgba(7, 19, 31, 0.84);
+    --navbar-bg-scrolled: rgba(7, 19, 31, 0.96);
+    --hero-decor-bg: rgba(13, 27, 42, 0.92);
+    --hero-decor-text: #d7ffe6;
+    --hero-decor-border: rgba(34, 197, 94, 0.46);
+    --hero-decor-outline: rgba(34, 197, 94, 0.32);
+    --hero-spark-bg: rgba(13, 27, 42, 0.54);
+    --hero-spark-text: #d7ffe6;
+    --hero-decor-shadow: rgba(0, 0, 0, 0.28);
 }
 
 [data-theme="color"] {
@@ -39,6 +46,13 @@
     --theme-sheen: rgba(224, 86, 86, 0.04);
     --navbar-bg: rgba(248, 245, 241, 0.9);
     --navbar-bg-scrolled: rgba(248, 245, 241, 0.98);
+    --hero-decor-bg: rgba(255, 255, 255, 0.94);
+    --hero-decor-text: #1f2933;
+    --hero-decor-border: rgba(224, 86, 86, 0.34);
+    --hero-decor-outline: rgba(224, 86, 86, 0.28);
+    --hero-spark-bg: rgba(255, 255, 255, 0.62);
+    --hero-spark-text: #c94444;
+    --hero-decor-shadow: rgba(109, 79, 65, 0.18);
 }
 
 * {
@@ -322,7 +336,150 @@ a {
 .hero-content {
     max-width: 600px;
     position: relative;
+    z-index: 2;
+}
+
+.hero-decor {
+    position: absolute;
+    inset: 0;
     z-index: 1;
+    pointer-events: none;
+}
+
+.hero-tag,
+.hero-spark {
+    position: absolute;
+    user-select: none;
+    animation: decorFloat 7s ease-in-out infinite;
+}
+
+.hero-tag {
+    min-width: 4.6rem;
+    padding: 0.5rem 0.95rem;
+    border: 1px solid var(--hero-decor-border);
+    border-radius: 999px;
+    background: var(--hero-decor-bg);
+    color: var(--hero-decor-text);
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 14px 34px var(--hero-decor-shadow);
+}
+
+.hero-spark {
+    width: 4.4rem;
+    height: 3.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--hero-decor-outline);
+    border-radius: 999px;
+    color: var(--hero-spark-text);
+    font-size: 2rem;
+    font-weight: 500;
+    background: var(--hero-spark-bg);
+}
+
+.tag-dev {
+    top: 19%;
+    left: 16%;
+    transform: rotate(-3deg);
+}
+
+.tag-ai {
+    top: 45%;
+    left: 0.6rem;
+    transform: rotate(-10deg);
+    animation-delay: -2s;
+}
+
+.tag-code {
+    top: 18%;
+    right: 15%;
+    transform: rotate(11deg);
+    animation-delay: -1s;
+}
+
+.tag-data {
+    top: 45%;
+    right: 0.6rem;
+    transform: rotate(-10deg);
+    animation-delay: -3s;
+}
+
+.tag-web {
+    top: 72%;
+    left: 15%;
+    transform: rotate(9deg);
+    animation-delay: -4s;
+}
+
+.tag-api {
+    top: 73%;
+    right: 16%;
+    transform: rotate(-4deg);
+    animation-delay: -1.5s;
+}
+
+.tag-js {
+    top: 84%;
+    left: 7%;
+    transform: rotate(-7deg);
+    animation-delay: -5s;
+}
+
+.tag-sys {
+    top: 84%;
+    right: 7%;
+    transform: rotate(7deg);
+    animation-delay: -2.75s;
+}
+
+.tag-ui {
+    top: 88%;
+    left: 32%;
+    transform: rotate(5deg);
+    animation-delay: -3.75s;
+}
+
+.tag-cli {
+    top: 88%;
+    right: 31%;
+    transform: rotate(-6deg);
+    animation-delay: -4.25s;
+}
+
+.spark-one {
+    top: 30%;
+    left: 7%;
+    transform: rotate(-13deg);
+    animation-delay: -2.5s;
+}
+
+.spark-two {
+    top: 14%;
+    right: 35%;
+    transform: rotate(8deg);
+    animation-delay: -4.5s;
+}
+
+.spark-three {
+    top: 58%;
+    right: 7%;
+    transform: rotate(14deg);
+    animation-delay: -3.5s;
+}
+
+.spark-four {
+    top: 58%;
+    left: 8%;
+    transform: rotate(10deg);
+    animation-delay: -1.25s;
+}
+
+@keyframes decorFloat {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -0.6rem; }
 }
 
 .hero h1 {
@@ -892,6 +1049,67 @@ footer {
     
     .hero h1 {
         font-size: 2.5rem;
+    }
+
+    .hero-decor {
+        opacity: 0.72;
+    }
+
+    .hero-tag {
+        min-width: 3.8rem;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .hero-spark {
+        width: 3.1rem;
+        height: 2.3rem;
+        font-size: 1.35rem;
+    }
+
+    .tag-dev {
+        top: 25%;
+        left: 5%;
+    }
+
+    .tag-ai,
+    .tag-web,
+    .tag-js,
+    .tag-sys,
+    .tag-ui,
+    .tag-cli {
+        display: none;
+    }
+
+    .tag-code {
+        top: 22%;
+        right: 4%;
+    }
+
+    .tag-data {
+        top: 58%;
+        right: 6%;
+    }
+
+    .tag-api {
+        top: 61%;
+        left: 7%;
+        right: auto;
+    }
+
+    .spark-one {
+        top: 42%;
+        left: 3%;
+    }
+
+    .spark-two {
+        top: 16%;
+        right: 31%;
+    }
+
+    .spark-three,
+    .spark-four {
+        display: none;
     }
     
     .section {
