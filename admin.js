@@ -80,6 +80,31 @@ function setLocalizedList(record, key, locale, text) {
     record[key] = nextList;
 }
 
+function dedupeLocalizedList(list) {
+    const seen = new Set();
+
+    return (Array.isArray(list) ? list : []).filter((item) => {
+        const values = LOCALES
+            .map((locale) => getLocalizedValue(item, locale).trim().toLowerCase())
+            .filter(Boolean);
+        const key = values[0] || '';
+
+        if (!key || seen.has(key)) {
+            return false;
+        }
+
+        seen.add(key);
+        return true;
+    });
+}
+
+function normalizeSkills(skills) {
+    return (Array.isArray(skills) ? skills : []).map((category) => ({
+        ...category,
+        items: dedupeLocalizedList(category.items)
+    }));
+}
+
 function createId(prefix) {
     return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -585,7 +610,7 @@ function normalizeData(data) {
     return {
         schemaVersion: data.schemaVersion || 1,
         projects: Array.isArray(data.projects) ? data.projects : [],
-        skills: Array.isArray(data.skills) ? data.skills : [],
+        skills: normalizeSkills(data.skills),
         interests: Array.isArray(data.interests) ? data.interests : [],
         education: Array.isArray(data.education) ? data.education : [],
         languages: Array.isArray(data.languages) ? data.languages : [],
