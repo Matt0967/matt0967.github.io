@@ -252,6 +252,122 @@
       ]
     }
   ],
+  "interests": [
+    {
+      "id": "electronics",
+      "label": {
+        "fr": "Électronique et Arduino",
+        "en": "Electronics and Arduino",
+        "es": "Electrónica y Arduino"
+      }
+    },
+    {
+      "id": "printing",
+      "label": {
+        "fr": "Modélisation et impression 3D",
+        "en": "3D modeling and printing",
+        "es": "Modelado e impresión 3D"
+      }
+    },
+    {
+      "id": "diy",
+      "label": {
+        "fr": "Bricolage et création DIY",
+        "en": "DIY building and creation",
+        "es": "Bricolaje y creación DIY"
+      }
+    },
+    {
+      "id": "hardware",
+      "label": {
+        "fr": "Informatique et hardware",
+        "en": "Computing and hardware",
+        "es": "Informática y hardware"
+      }
+    },
+    {
+      "id": "applied-electronics",
+      "label": {
+        "fr": "Électronique appliquée",
+        "en": "Applied electronics",
+        "es": "Electrónica aplicada"
+      }
+    },
+    {
+      "id": "cognition",
+      "label": {
+        "fr": "Sciences cognitives",
+        "en": "Cognitive science",
+        "es": "Ciencias cognitivas"
+      }
+    },
+    {
+      "id": "history",
+      "label": {
+        "fr": "Histoire et culture générale",
+        "en": "History and general culture",
+        "es": "Historia y cultura general"
+      }
+    }
+  ],
+  "education": [
+    {
+      "id": "primary",
+      "title": {
+        "fr": "École primaire",
+        "en": "Primary school",
+        "es": "Escuela primaria"
+      },
+      "school": {
+        "fr": "Mariette Delahaute.",
+        "en": "Mariette Delahaute.",
+        "es": "Mariette Delahaute."
+      },
+      "year": "2017 - 2022"
+    },
+    {
+      "id": "secondary",
+      "title": {
+        "fr": "École secondaire",
+        "en": "Secondary school",
+        "es": "Escuela secundaria"
+      },
+      "school": {
+        "fr": "Centre scolaire à Asty-Moulin",
+        "en": "Asty-Moulin school center",
+        "es": "Centro escolar Asty-Moulin"
+      },
+      "year": "2022 - 2025"
+    },
+    {
+      "id": "arduino",
+      "title": {
+        "fr": "Arduino et DIY",
+        "en": "Arduino and DIY",
+        "es": "Arduino y DIY"
+      },
+      "school": {
+        "fr": "Formation à distance en Arduino et composants électroniques.",
+        "en": "Remote training in Arduino and electronic components.",
+        "es": "Formación a distancia en Arduino y componentes electrónicos."
+      },
+      "year": "2025 - 2026"
+    },
+    {
+      "id": "modeling",
+      "title": {
+        "fr": "Modélisation 3D",
+        "en": "3D Modeling",
+        "es": "Modelado 3D"
+      },
+      "school": {
+        "fr": "Formation à distance en modélisation et impression 3D.",
+        "en": "Remote training in 3D modeling and printing.",
+        "es": "Formación a distancia en modelado e impresión 3D."
+      },
+      "year": "2025 - 2026"
+    }
+  ],
   "languages": [
     {
       "id": "french",
