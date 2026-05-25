@@ -293,6 +293,7 @@ function renderSkills() {
 }
 
 function renderInterests() {
+    state.data.interests = Array.isArray(state.data.interests) ? state.data.interests : [];
     tabEyebrow.textContent = 'Centres d’intérêt';
     tabTitle.textContent = 'Centres d’intérêt';
     addButton.hidden = false;
@@ -322,6 +323,7 @@ function renderInterests() {
 }
 
 function renderEducation() {
+    state.data.education = Array.isArray(state.data.education) ? state.data.education : [];
     tabEyebrow.textContent = 'Formation';
     tabTitle.textContent = 'Formation - Éducation';
     addButton.hidden = false;
