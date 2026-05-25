@@ -491,6 +491,8 @@ function normalizeData(data) {
         schemaVersion: data.schemaVersion || 1,
         projects: Array.isArray(data.projects) ? data.projects : [],
         skills: Array.isArray(data.skills) ? data.skills : [],
+        interests: Array.isArray(data.interests) ? data.interests : [],
+        education: Array.isArray(data.education) ? data.education : [],
         languages: Array.isArray(data.languages) ? data.languages : [],
         contact: data.contact && typeof data.contact === 'object' ? data.contact : {
             notionFormUrl: '',
@@ -672,13 +674,18 @@ async function loadInitialData() {
         state.data = normalizeData(await response.json());
         setStatus('Données chargées depuis portfolio-data.json.', 'ready');
     } catch (error) {
-        state.data = normalizeData({ schemaVersion: 1, projects: [], skills: [], languages: [] });
+        state.data = normalizeData({ schemaVersion: 1, projects: [], skills: [], interests: [], education: [], languages: [] });
         setStatus('portfolio-data.json introuvable. Import possible via JSON.', 'error');
     }
 
     if (draft) {
         try {
-            state.data = normalizeData(JSON.parse(draft));
+            const draftData = JSON.parse(draft);
+            state.data = normalizeData({
+                ...state.data,
+                ...draftData,
+                contact: { ...state.data.contact, ...(draftData.contact || {}) }
+            });
             setStatus('Brouillon local restauré.', 'ready');
         } catch (error) {
             localStorage.removeItem(DRAFT_KEY);
