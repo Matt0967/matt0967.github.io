@@ -268,6 +268,80 @@ function renderSkills() {
     });
 }
 
+function renderInterests() {
+    tabEyebrow.textContent = 'Centres d’intérêt';
+    tabTitle.textContent = 'Centres d’intérêt';
+    addButton.hidden = false;
+    addButton.textContent = 'Ajouter un centre d’intérêt';
+    editor.replaceChildren();
+
+    if (!state.data.interests.length) {
+        editor.append(createEmptyState('Aucun centre d’intérêt pour le moment.'));
+    }
+
+    state.data.interests.forEach((interest, index) => {
+        const body = document.createElement('div');
+        body.className = 'field-grid';
+        renderLocalizedInputs(interest, 'label', 'Centre d’intérêt').forEach((field) => body.append(field));
+
+        editor.append(createEditorCard(
+            getLocalizedValue(interest.label, 'fr'),
+            interest.id,
+            [
+                createButton('Monter', 'mini-button', () => moveItem(state.data.interests, index, -1)),
+                createButton('Descendre', 'mini-button', () => moveItem(state.data.interests, index, 1)),
+                createButton('Supprimer', 'danger-button', () => removeItem(state.data.interests, index))
+            ],
+            body
+        ));
+    });
+}
+
+function renderEducation() {
+    tabEyebrow.textContent = 'Formation';
+    tabTitle.textContent = 'Formation - Éducation';
+    addButton.hidden = false;
+    addButton.textContent = 'Ajouter une formation';
+    editor.replaceChildren();
+
+    if (!state.data.education.length) {
+        editor.append(createEmptyState('Aucune formation pour le moment.'));
+    }
+
+    state.data.education.forEach((educationItem, index) => {
+        const body = document.createElement('div');
+        body.className = 'field-grid';
+        renderLocalizedInputs(educationItem, 'title', 'Titre').forEach((field) => body.append(field));
+        renderLocalizedInputs(educationItem, 'school', 'École / organisme', true).forEach((field) => body.append(field));
+
+        const yearField = document.createElement('div');
+        yearField.className = 'field full';
+        const yearLabel = document.createElement('label');
+        yearLabel.setAttribute('for', `${educationItem.id}-year`);
+        yearLabel.textContent = 'Années';
+        const yearInput = document.createElement('input');
+        yearInput.id = `${educationItem.id}-year`;
+        yearInput.value = educationItem.year || '';
+        yearInput.placeholder = '2025 - 2026';
+        yearInput.addEventListener('input', () => {
+            educationItem.year = yearInput.value;
+        });
+        yearField.append(yearLabel, yearInput);
+        body.append(yearField);
+
+        editor.append(createEditorCard(
+            getLocalizedValue(educationItem.title, 'fr'),
+            educationItem.id,
+            [
+                createButton('Monter', 'mini-button', () => moveItem(state.data.education, index, -1)),
+                createButton('Descendre', 'mini-button', () => moveItem(state.data.education, index, 1)),
+                createButton('Supprimer', 'danger-button', () => removeItem(state.data.education, index))
+            ],
+            body
+        ));
+    });
+}
+
 function renderLanguages() {
     tabEyebrow.textContent = 'Langues parlées';
     tabTitle.textContent = 'Langues';
@@ -429,6 +503,8 @@ function render() {
     const renderers = {
         projects: renderProjects,
         skills: renderSkills,
+        interests: renderInterests,
+        education: renderEducation,
         languages: renderLanguages,
         contact: renderContactSettings,
         publish: renderPublish
@@ -451,6 +527,16 @@ function addCurrentItem() {
             id: createId('skills'),
             title: emptyLocalizedValue(),
             items: []
+        }),
+        interests: () => state.data.interests.push({
+            id: createId('interest'),
+            label: emptyLocalizedValue()
+        }),
+        education: () => state.data.education.push({
+            id: createId('education'),
+            title: emptyLocalizedValue(),
+            school: emptyLocalizedValue(),
+            year: ''
         }),
         languages: () => state.data.languages.push({
             id: createId('language'),
