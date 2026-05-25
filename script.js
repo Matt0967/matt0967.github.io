@@ -499,10 +499,47 @@ function renderSkills(language) {
     });
 }
 
+function renderInterests(language) {
+    const interestsList = document.querySelector('#interests .interests-list');
+
+    if (!interestsList || !Array.isArray(portfolioData?.interests)) {
+        return;
+    }
+
+    interestsList.replaceChildren();
+
+    portfolioData.interests.forEach((interest) => {
+        interestsList.append(createTextElement('li', '', getLocalizedValue(interest.label, language)));
+    });
+}
+
+function renderEducation(language) {
+    const educationList = document.querySelector('#education .education-list');
+
+    if (!educationList || !Array.isArray(portfolioData?.education)) {
+        return;
+    }
+
+    educationList.replaceChildren();
+
+    portfolioData.education.forEach((educationItem) => {
+        const item = document.createElement('div');
+        item.className = 'education-item';
+
+        item.append(
+            createTextElement('h3', '', getLocalizedValue(educationItem.title, language)),
+            createTextElement('p', 'school', getLocalizedValue(educationItem.school, language)),
+            createTextElement('p', 'year', educationItem.year || '')
+        );
+
+        educationList.append(item);
+    });
+}
+
 function renderLanguages(language) {
     const languagesContainer = document.querySelector('#languages .languages');
 
-    if (!languagesContainer || !portfolioData?.languages?.length) {
+    if (!languagesContainer || !Array.isArray(portfolioData?.languages)) {
         return;
     }
 
@@ -558,6 +595,8 @@ function renderContact(language) {
 function renderPortfolioSections(language) {
     renderProjects(language);
     renderSkills(language);
+    renderInterests(language);
+    renderEducation(language);
     renderLanguages(language);
     renderContact(language);
 }
