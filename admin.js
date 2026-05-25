@@ -58,10 +58,9 @@ function setLocalizedList(record, key, locale, text) {
         .map((item) => item.trim())
         .filter(Boolean);
 
-    const maxLength = Math.max(record[key]?.length || 0, nextValues.length);
     const nextList = [];
 
-    for (let index = 0; index < maxLength; index += 1) {
+    for (let index = 0; index < nextValues.length; index += 1) {
         const existing = record[key]?.[index];
         const localizedItem = emptyLocalizedValue();
 
@@ -69,7 +68,7 @@ function setLocalizedList(record, key, locale, text) {
             localizedItem[availableLocale] = getLocalizedValue(existing, availableLocale);
         });
 
-        localizedItem[locale] = nextValues[index] || '';
+        localizedItem[locale] = nextValues[index];
 
         if (LOCALES.some((availableLocale) => localizedItem[availableLocale])) {
             const values = LOCALES.map((availableLocale) => localizedItem[availableLocale]);
