@@ -5,7 +5,7 @@ Le site reste compatible GitHub Pages: il n'y a pas de backend.
 ## Utilisation
 
 1. Ouvre `admin.html`.
-2. Modifie les projets, les compétences ou les langues.
+2. Modifie les projets, les compétences, les centres d'intérêt, les formations ou les langues.
 3. Dans `Contact`, colle l'URL publique de ton formulaire Notion.
 4. Sauvegarde en brouillon local, télécharge `portfolio-data.json`, ou publie directement via l'onglet `Publication`.
 
