@@ -536,7 +536,12 @@ function render() {
         publish: renderPublish
     };
 
-    renderers[state.activeTab]();
+    if (renderers[state.activeTab]) {
+        renderers[state.activeTab]();
+    } else {
+        state.activeTab = 'projects';
+        renderProjects();
+    }
 }
 
 function addCurrentItem() {
