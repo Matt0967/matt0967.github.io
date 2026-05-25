@@ -92,11 +92,21 @@ function setStatus(message, type = 'ready') {
     statusDot.classList.toggle('is-error', type === 'error');
 }
 
+function setCounter(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.textContent = value;
+    }
+}
+
 function updateCounts() {
-    document.getElementById('projectCount').textContent = state.data?.projects?.length || 0;
-    document.getElementById('skillCount').textContent = state.data?.skills?.length || 0;
-    document.getElementById('languageCount').textContent = state.data?.languages?.length || 0;
-    document.getElementById('contactStatus').textContent = state.data?.contact?.notionFormUrl ? 'Oui' : 'Non';
+    setCounter('projectCount', state.data?.projects?.length || 0);
+    setCounter('skillCount', state.data?.skills?.length || 0);
+    setCounter('interestCount', state.data?.interests?.length || 0);
+    setCounter('educationCount', state.data?.education?.length || 0);
+    setCounter('languageCount', state.data?.languages?.length || 0);
+    setCounter('contactStatus', state.data?.contact?.notionFormUrl ? 'Oui' : 'Non');
 }
 
 function renderLocalizedInputs(record, key, label, multiline = false) {
