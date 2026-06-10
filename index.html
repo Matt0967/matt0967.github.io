@@ -37,6 +37,62 @@
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                         </svg>
                     </button>
+                    <div class="accessibility-menu" id="accessibilityMenu">
+                        <button class="accessibility-toggle" id="accessibilityToggle" type="button" aria-label="Ouvrir les réglages d'accessibilité" aria-controls="accessibilityPanel" aria-expanded="false">
+                            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="4" r="2"/>
+                                <path d="M4 9h16"/>
+                                <path d="M12 9v11"/>
+                                <path d="M8 14l-3 6"/>
+                                <path d="M16 14l3 6"/>
+                            </svg>
+                        </button>
+                        <div class="accessibility-panel" id="accessibilityPanel" hidden>
+                            <div class="accessibility-panel-header">
+                                <h2 id="accessibilityTitle" data-i18n="accessibility.title">Accessibilité</h2>
+                                <button class="accessibility-close" id="accessibilityClose" type="button" aria-label="Fermer les réglages d'accessibilité">
+                                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M18 6 6 18"/>
+                                        <path d="m6 6 12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="accessibility-group">
+                                <p class="accessibility-label" id="textSizeLabel" data-i18n="accessibility.textSize">Taille du texte</p>
+                                <div class="segmented-control" role="group" aria-labelledby="textSizeLabel">
+                                    <button type="button" class="accessibility-option" data-a11y-text-option="normal" aria-pressed="true" data-i18n="accessibility.textNormal">Normal</button>
+                                    <button type="button" class="accessibility-option" data-a11y-text-option="large" aria-pressed="false" data-i18n="accessibility.textLarge">Grand</button>
+                                    <button type="button" class="accessibility-option" data-a11y-text-option="xlarge" aria-pressed="false" data-i18n="accessibility.textXLarge">Très grand</button>
+                                </div>
+                            </div>
+
+                            <div class="accessibility-group accessibility-toggles">
+                                <label class="accessibility-check">
+                                    <input type="checkbox" id="contrastToggle">
+                                    <span data-i18n="accessibility.highContrast">Contraste renforcé</span>
+                                </label>
+                                <label class="accessibility-check">
+                                    <input type="checkbox" id="motionToggle">
+                                    <span data-i18n="accessibility.reduceMotion">Réduire les animations</span>
+                                </label>
+                                <label class="accessibility-check">
+                                    <input type="checkbox" id="linksToggle">
+                                    <span data-i18n="accessibility.underlineLinks">Souligner les liens</span>
+                                </label>
+                                <label class="accessibility-check">
+                                    <input type="checkbox" id="fontToggle">
+                                    <span data-i18n="accessibility.readableFont">Police plus lisible</span>
+                                </label>
+                                <label class="accessibility-check">
+                                    <input type="checkbox" id="spacingToggle">
+                                    <span data-i18n="accessibility.comfortSpacing">Interligne confortable</span>
+                                </label>
+                            </div>
+
+                            <button class="accessibility-reset" id="accessibilityReset" type="button" data-i18n="accessibility.reset">Réinitialiser</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>

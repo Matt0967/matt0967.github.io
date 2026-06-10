@@ -3,7 +3,9 @@ const translations = {
         meta: {
             title: "Perez Matthieu // Développeur Junior // Admin Système Réseau",
             themeToggleAria: "Changer de thème",
-            languageSwitcherAria: "Changer de langue"
+            languageSwitcherAria: "Changer de langue",
+            accessibilityToggleAria: "Ouvrir les réglages d'accessibilité",
+            accessibilityCloseAria: "Fermer les réglages d'accessibilité"
         },
         nav: {
             about: "À propos",
@@ -130,6 +132,27 @@ const translations = {
             title: "Contact",
             formPlaceholder: "Formulaire Notion à configurer."
         },
+        accessibility: {
+            title: "Accessibilité",
+            textSize: "Taille du texte",
+            textNormal: "Normal",
+            textLarge: "Grand",
+            textXLarge: "Très grand",
+            highContrast: "Contraste renforcé",
+            reduceMotion: "Réduire les animations",
+            underlineLinks: "Souligner les liens",
+            readableFont: "Police plus lisible",
+            comfortSpacing: "Interligne confortable",
+            reset: "Réinitialiser"
+        },
+        easterEgg: {
+            title: "Mode build débloqué",
+            lines: [
+                "> compilation du profil",
+                "> synchronisation des compétences",
+                "> déploiement du portfolio"
+            ]
+        },
         footer: {
             copy: "© 2025 Perez Matthieu // Développeur."
         }
@@ -138,7 +161,9 @@ const translations = {
         meta: {
             title: "Perez Matthieu // Junior Developer // Network Systems Admin",
             themeToggleAria: "Change theme",
-            languageSwitcherAria: "Change language"
+            languageSwitcherAria: "Change language",
+            accessibilityToggleAria: "Open accessibility settings",
+            accessibilityCloseAria: "Close accessibility settings"
         },
         nav: {
             about: "About",
@@ -265,6 +290,27 @@ const translations = {
             title: "Contact",
             formPlaceholder: "Notion form to configure."
         },
+        accessibility: {
+            title: "Accessibility",
+            textSize: "Text size",
+            textNormal: "Normal",
+            textLarge: "Large",
+            textXLarge: "Very large",
+            highContrast: "High contrast",
+            reduceMotion: "Reduce animations",
+            underlineLinks: "Underline links",
+            readableFont: "More readable font",
+            comfortSpacing: "Comfortable line spacing",
+            reset: "Reset"
+        },
+        easterEgg: {
+            title: "Build mode unlocked",
+            lines: [
+                "> compiling profile",
+                "> syncing skills",
+                "> deploying portfolio"
+            ]
+        },
         footer: {
             copy: "© 2025 Perez Matthieu // Developer."
         }
@@ -273,7 +319,9 @@ const translations = {
         meta: {
             title: "Perez Matthieu // Desarrollador Junior // Admin de Redes y Sistemas",
             themeToggleAria: "Cambiar tema",
-            languageSwitcherAria: "Cambiar idioma"
+            languageSwitcherAria: "Cambiar idioma",
+            accessibilityToggleAria: "Abrir ajustes de accesibilidad",
+            accessibilityCloseAria: "Cerrar ajustes de accesibilidad"
         },
         nav: {
             about: "Perfil",
@@ -399,6 +447,27 @@ const translations = {
         contact: {
             title: "Contacto",
             formPlaceholder: "Formulario de Notion por configurar."
+        },
+        accessibility: {
+            title: "Accesibilidad",
+            textSize: "Tamaño del texto",
+            textNormal: "Normal",
+            textLarge: "Grande",
+            textXLarge: "Muy grande",
+            highContrast: "Contraste alto",
+            reduceMotion: "Reducir animaciones",
+            underlineLinks: "Subrayar enlaces",
+            readableFont: "Fuente más legible",
+            comfortSpacing: "Interlineado cómodo",
+            reset: "Restablecer"
+        },
+        easterEgg: {
+            title: "Modo build desbloqueado",
+            lines: [
+                "> compilando perfil",
+                "> sincronizando habilidades",
+                "> desplegando portfolio"
+            ]
         },
         footer: {
             copy: "© 2025 Perez Matthieu // Desarrollador."
@@ -615,11 +684,38 @@ async function loadPortfolioData() {
     }
 }
 
+const ACCESSIBILITY_STORAGE_KEY = 'accessibilitySettings';
+const DEFAULT_ACCESSIBILITY_SETTINGS = {
+    textSize: 'normal',
+    highContrast: false,
+    reduceMotion: false,
+    underlineLinks: false,
+    readableFont: false,
+    comfortableSpacing: false
+};
+
+function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('themeToggle');
     const languageSwitcher = document.getElementById('languageSwitcher');
+    const accessibilityMenu = document.getElementById('accessibilityMenu');
+    const accessibilityToggle = document.getElementById('accessibilityToggle');
+    const accessibilityPanel = document.getElementById('accessibilityPanel');
+    const accessibilityClose = document.getElementById('accessibilityClose');
+    const accessibilityReset = document.getElementById('accessibilityReset');
+    const textSizeButtons = document.querySelectorAll('[data-a11y-text-option]');
+    const contrastToggle = document.getElementById('contrastToggle');
+    const motionToggle = document.getElementById('motionToggle');
+    const linksToggle = document.getElementById('linksToggle');
+    const fontToggle = document.getElementById('fontToggle');
+    const spacingToggle = document.getElementById('spacingToggle');
+    const logo = document.querySelector('.logo');
     const navbar = document.querySelector('.navbar');
     let itemObserver = null;
+    let accessibilitySettings = readAccessibilitySettings();
 
     function updateNavbarBackground() {
         const rootStyles = getComputedStyle(document.documentElement);
@@ -639,6 +735,133 @@ document.addEventListener('DOMContentLoaded', () => {
         updateNavbarBackground();
     }
 
+    function readAccessibilitySettings() {
+        try {
+            const savedSettings = JSON.parse(localStorage.getItem(ACCESSIBILITY_STORAGE_KEY));
+
+            return {
+                ...DEFAULT_ACCESSIBILITY_SETTINGS,
+                ...(savedSettings && typeof savedSettings === 'object' ? savedSettings : {})
+            };
+        } catch (error) {
+            return { ...DEFAULT_ACCESSIBILITY_SETTINGS };
+        }
+    }
+
+    function setRootAttribute(attributeName, value, defaultValue) {
+        if (value && value !== defaultValue) {
+            document.documentElement.setAttribute(attributeName, value);
+        } else {
+            document.documentElement.removeAttribute(attributeName);
+        }
+    }
+
+    function updateAccessibilityControls() {
+        textSizeButtons.forEach((button) => {
+            const isActive = button.dataset.a11yTextOption === accessibilitySettings.textSize;
+            button.setAttribute('aria-pressed', String(isActive));
+        });
+
+        if (contrastToggle) {
+            contrastToggle.checked = accessibilitySettings.highContrast;
+        }
+
+        if (motionToggle) {
+            motionToggle.checked = accessibilitySettings.reduceMotion;
+        }
+
+        if (linksToggle) {
+            linksToggle.checked = accessibilitySettings.underlineLinks;
+        }
+
+        if (fontToggle) {
+            fontToggle.checked = accessibilitySettings.readableFont;
+        }
+
+        if (spacingToggle) {
+            spacingToggle.checked = accessibilitySettings.comfortableSpacing;
+        }
+    }
+
+    function applyAccessibility(nextSettings, shouldPersist = true) {
+        accessibilitySettings = {
+            ...DEFAULT_ACCESSIBILITY_SETTINGS,
+            ...nextSettings,
+            textSize: ['normal', 'large', 'xlarge'].includes(nextSettings.textSize) ? nextSettings.textSize : 'normal'
+        };
+
+        setRootAttribute('data-a11y-text', accessibilitySettings.textSize, 'normal');
+        setRootAttribute('data-a11y-contrast', accessibilitySettings.highContrast ? 'high' : '', '');
+        setRootAttribute('data-a11y-motion', accessibilitySettings.reduceMotion ? 'reduced' : '', '');
+        setRootAttribute('data-a11y-links', accessibilitySettings.underlineLinks ? 'underlined' : '', '');
+        setRootAttribute('data-a11y-font', accessibilitySettings.readableFont ? 'system' : '', '');
+        setRootAttribute('data-a11y-spacing', accessibilitySettings.comfortableSpacing ? 'comfortable' : '', '');
+
+        updateAccessibilityControls();
+
+        if (shouldPersist) {
+            localStorage.setItem(ACCESSIBILITY_STORAGE_KEY, JSON.stringify(accessibilitySettings));
+        }
+
+        updateNavbarBackground();
+    }
+
+    function setAccessibilityPanelOpen(isOpen) {
+        if (!accessibilityPanel || !accessibilityToggle) {
+            return;
+        }
+
+        accessibilityPanel.hidden = !isOpen;
+        accessibilityToggle.setAttribute('aria-expanded', String(isOpen));
+
+        if (isOpen) {
+            const firstControl = accessibilityPanel.querySelector('button, input, select, textarea, a[href]');
+            firstControl?.focus();
+        } else if (document.activeElement && accessibilityPanel.contains(document.activeElement)) {
+            accessibilityToggle.focus();
+        }
+    }
+
+    function shouldUseReducedMotion() {
+        return accessibilitySettings.reduceMotion || prefersReducedMotion();
+    }
+
+    function triggerEasterEgg() {
+        document.querySelector('.easter-egg-terminal')?.remove();
+
+        const currentLanguage = translations[document.documentElement.lang] ? document.documentElement.lang : 'fr';
+        const copy = translations[currentLanguage].easterEgg || translations.fr.easterEgg;
+        const terminal = document.createElement('div');
+        terminal.className = 'easter-egg-terminal';
+        terminal.setAttribute('role', 'status');
+        terminal.setAttribute('aria-live', 'polite');
+
+        const title = createTextElement('p', 'easter-egg-title', copy.title);
+        const lines = document.createElement('div');
+        lines.className = 'easter-egg-lines';
+
+        copy.lines.forEach((line) => {
+            lines.append(createTextElement('span', '', line));
+        });
+
+        const progress = document.createElement('div');
+        progress.className = 'easter-egg-progress';
+
+        const circuit = document.createElement('div');
+        circuit.className = 'easter-egg-circuit';
+
+        for (let index = 0; index < 5; index += 1) {
+            circuit.append(document.createElement('i'));
+        }
+
+        terminal.append(title, lines, progress, circuit);
+        document.body.append(terminal);
+
+        window.setTimeout(() => {
+            terminal.remove();
+        }, shouldUseReducedMotion() ? 2600 : 5200);
+    }
+
     // Tous les textes passent par data-i18n, ce qui évite de disperser les chaînes dans le HTML et le JS.
     function applyLanguage(language) {
         const selectedLanguage = translations[language] ? language : 'fr';
@@ -648,6 +871,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.title = copy.meta.title;
         themeToggle.setAttribute('aria-label', copy.meta.themeToggleAria);
         languageSwitcher.setAttribute('aria-label', copy.meta.languageSwitcherAria);
+        accessibilityToggle?.setAttribute('aria-label', copy.meta.accessibilityToggleAria);
+        accessibilityClose?.setAttribute('aria-label', copy.meta.accessibilityCloseAria);
 
         document.querySelectorAll('[data-i18n]').forEach((element) => {
             const key = element.dataset.i18n;
@@ -694,6 +919,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedLanguage = localStorage.getItem('language');
 
     applyTheme(savedTheme === 'color' ? 'color' : 'dark');
+    applyAccessibility(accessibilitySettings, false);
     applyLanguage(savedLanguage || 'fr');
     loadPortfolioData().then(() => {
         applyLanguage(localStorage.getItem('language') || savedLanguage || 'fr');
@@ -708,20 +934,117 @@ document.addEventListener('DOMContentLoaded', () => {
         applyLanguage(event.target.value);
     });
 
+    accessibilityToggle?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        setAccessibilityPanelOpen(accessibilityPanel?.hidden ?? true);
+    });
+
+    accessibilityClose?.addEventListener('click', () => {
+        setAccessibilityPanelOpen(false);
+    });
+
+    textSizeButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            applyAccessibility({
+                ...accessibilitySettings,
+                textSize: button.dataset.a11yTextOption || 'normal'
+            });
+        });
+    });
+
+    contrastToggle?.addEventListener('change', (event) => {
+        applyAccessibility({
+            ...accessibilitySettings,
+            highContrast: event.target.checked
+        });
+    });
+
+    motionToggle?.addEventListener('change', (event) => {
+        applyAccessibility({
+            ...accessibilitySettings,
+            reduceMotion: event.target.checked
+        });
+    });
+
+    linksToggle?.addEventListener('change', (event) => {
+        applyAccessibility({
+            ...accessibilitySettings,
+            underlineLinks: event.target.checked
+        });
+    });
+
+    fontToggle?.addEventListener('change', (event) => {
+        applyAccessibility({
+            ...accessibilitySettings,
+            readableFont: event.target.checked
+        });
+    });
+
+    spacingToggle?.addEventListener('change', (event) => {
+        applyAccessibility({
+            ...accessibilitySettings,
+            comfortableSpacing: event.target.checked
+        });
+    });
+
+    accessibilityReset?.addEventListener('click', () => {
+        applyAccessibility({ ...DEFAULT_ACCESSIBILITY_SETTINGS });
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!accessibilityPanel?.hidden && accessibilityMenu && !accessibilityMenu.contains(event.target)) {
+            setAccessibilityPanelOpen(false);
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !accessibilityPanel?.hidden) {
+            setAccessibilityPanelOpen(false);
+        }
+    });
+
     window.addEventListener('scroll', updateNavbarBackground);
 
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const targetSelector = this.getAttribute('href');
+
+            if (targetSelector === '#') {
+                window.scrollTo({
+                    top: 0,
+                    behavior: shouldUseReducedMotion() ? 'auto' : 'smooth'
+                });
+                return;
+            }
+
+            const target = document.querySelector(targetSelector);
 
             if (target) {
                 target.scrollIntoView({
-                    behavior: 'smooth',
+                    behavior: shouldUseReducedMotion() ? 'auto' : 'smooth',
                     block: 'start'
                 });
             }
         });
+    });
+
+    let easterEggClicks = 0;
+    let easterEggTimer = null;
+
+    logo?.addEventListener('click', () => {
+        easterEggClicks += 1;
+        window.clearTimeout(easterEggTimer);
+
+        if (easterEggClicks >= 10) {
+            easterEggClicks = 0;
+            triggerEasterEgg();
+            return;
+        }
+
+        easterEggTimer = window.setTimeout(() => {
+            easterEggClicks = 0;
+        }, 2500);
     });
 
     const observerOptions = {
@@ -760,6 +1083,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('mousemove', (e) => {
+    if (document.documentElement.getAttribute('data-a11y-motion') === 'reduced' || prefersReducedMotion()) {
+        document.querySelector('.cursor-glow')?.remove();
+        return;
+    }
+
     let glow = document.querySelector('.cursor-glow');
 
     if (!glow) {
