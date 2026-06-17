@@ -98,9 +98,9 @@
         "es": "Diseño de un sistema de gestión del tiempo basado en la técnica Pomodoro."
       },
       "status": {
-        "fr": "Terminé",
-        "en": "Completed",
-        "es": "Terminado"
+        "fr": "Prototype",
+        "en": "Prototype",
+        "es": "Prototipo"
       },
       "tech": [
         "Arduino",
@@ -135,9 +135,9 @@
         "es": "Instalación y configuración de software, resolución de problemas simples y ayuda técnica a usuarios."
       },
       "status": {
-        "fr": "En cours",
-        "en": "Ongoing",
-        "es": "En curso"
+        "fr": "Terminé",
+        "en": "Completed",
+        "es": "Terminado"
       },
       "tech": [
         "Windows",
@@ -172,9 +172,9 @@
         "es": "Creación de sistemas de gestión de tareas y planificación para mejorar la estructura, el estudio y los métodos de trabajo."
       },
       "status": {
-        "fr": "En cours",
-        "en": "Ongoing",
-        "es": "En curso"
+        "fr": "Terminé",
+        "en": "Completed",
+        "es": "Terminado"
       },
       "tech": [
         {
