@@ -30,7 +30,7 @@ Le bouton PDF du portfolio utilise l'impression navigateur si aucune URL de PDF 
 
 ## Mini terminal et easter eggs
 
-Le portfolio contient un mini terminal côté navigateur. Les commandes utiles sont visibles via `help`; certains déclencheurs ouvrent une page cachée full screen dans un nouvel onglet. Tout reste statique et compatible GitHub Pages.
+Le lien `Terminal` de la navigation ouvre un terminal côté navigateur dans un nouvel onglet plein écran. Les commandes utiles sont visibles via `help`; certains déclencheurs ouvrent une page cachée full screen dans un nouvel onglet. Tout reste statique et compatible GitHub Pages.
 
 ## Contact Notion
 

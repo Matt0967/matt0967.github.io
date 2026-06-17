@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex, nofollow">
+        <title>Portfolio // Terminal</title>
+        <link rel="stylesheet" href="terminal.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <main class="terminal-page">
+            <header class="terminal-header">
+                <a href="index.html">Retour au portfolio</a>
+                <span>portfolio://terminal</span>
+            </header>
+
+            <section class="terminal-window" aria-label="Terminal interactif du portfolio">
+                <div class="terminal-toolbar" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="terminal-output" id="terminalOutput" aria-live="polite"></div>
+                <form class="terminal-input-row" id="terminalForm">
+                    <label class="sr-only" for="terminalInput">Commande terminal</label>
+                    <span aria-hidden="true">&gt;</span>
+                    <input id="terminalInput" autocomplete="off" spellcheck="false" placeholder="help" autofocus>
+                </form>
+            </section>
+        </main>
+        <script src="terminal.js"></script>
+    </body>
+</html>
