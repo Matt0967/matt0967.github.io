@@ -11,7 +11,8 @@ const translations = {
             about: "À propos",
             experience: "Expérience",
             skills: "Compétences",
-            contact: "Contact"
+            contact: "Contact",
+            terminal: "Terminal"
         },
         hero: {
             subtitle: "Développeur Junior // Administrateur Réseaux",
@@ -132,6 +133,20 @@ const translations = {
             title: "Contact",
             formPlaceholder: "Formulaire Notion à configurer."
         },
+        cv: {
+            printLabel: "Exporter le CV en PDF"
+        },
+        terminal: {
+            title: "Terminal",
+            inputLabel: "Commande terminal",
+            placeholder: "help",
+            welcome: "Terminal portfolio prêt. Tape help pour afficher les commandes.",
+            help: "Commandes: whoami, skills, projects, status, contact, cv, clear",
+            unknown: "Commande inconnue. Tape help.",
+            whoami: "Perez Matthieu // Développeur junior // Administrateur réseaux",
+            contact: "Contact: utilise le formulaire Notion dans la section Contact.",
+            cv: "Ouverture de l'export PDF..."
+        },
         accessibility: {
             title: "Accessibilité",
             textSize: "Taille du texte",
@@ -169,7 +184,8 @@ const translations = {
             about: "About",
             experience: "Experience",
             skills: "Skills",
-            contact: "Contact"
+            contact: "Contact",
+            terminal: "Terminal"
         },
         hero: {
             subtitle: "Junior Developer // Network Administrator",
@@ -290,6 +306,20 @@ const translations = {
             title: "Contact",
             formPlaceholder: "Notion form to configure."
         },
+        cv: {
+            printLabel: "Export resume as PDF"
+        },
+        terminal: {
+            title: "Terminal",
+            inputLabel: "Terminal command",
+            placeholder: "help",
+            welcome: "Portfolio terminal ready. Type help to list commands.",
+            help: "Commands: whoami, skills, projects, status, contact, cv, clear",
+            unknown: "Unknown command. Type help.",
+            whoami: "Perez Matthieu // Junior developer // Network administrator",
+            contact: "Contact: use the Notion form in the Contact section.",
+            cv: "Opening PDF export..."
+        },
         accessibility: {
             title: "Accessibility",
             textSize: "Text size",
@@ -327,7 +357,8 @@ const translations = {
             about: "Perfil",
             experience: "Experiencia",
             skills: "Competencias",
-            contact: "Contacto"
+            contact: "Contacto",
+            terminal: "Terminal"
         },
         hero: {
             subtitle: "Desarrollador Junior // Administrador de redes",
@@ -448,6 +479,20 @@ const translations = {
             title: "Contacto",
             formPlaceholder: "Formulario de Notion por configurar."
         },
+        cv: {
+            printLabel: "Exportar CV en PDF"
+        },
+        terminal: {
+            title: "Terminal",
+            inputLabel: "Comando de terminal",
+            placeholder: "help",
+            welcome: "Terminal del portfolio listo. Escribe help para ver los comandos.",
+            help: "Comandos: whoami, skills, projects, status, contact, cv, clear",
+            unknown: "Comando desconocido. Escribe help.",
+            whoami: "Perez Matthieu // Desarrollador junior // Administrador de redes",
+            contact: "Contacto: usa el formulario de Notion en la sección Contacto.",
+            cv: "Abriendo exportación PDF..."
+        },
         accessibility: {
             title: "Accesibilidad",
             textSize: "Tamaño del texto",
@@ -504,6 +549,31 @@ function createTextElement(tagName, className, text) {
     return element;
 }
 
+function getSkillLabel(skill, language) {
+    if (skill && typeof skill === 'object' && 'label' in skill) {
+        return getLocalizedValue(skill.label, language);
+    }
+
+    return getLocalizedValue(skill, language);
+}
+
+function getSkillLevel(skill, language) {
+    if (skill && typeof skill === 'object' && 'level' in skill) {
+        return getLocalizedValue(skill.level, language);
+    }
+
+    return '';
+}
+
+function createBadge(className, text) {
+    const badge = createTextElement('span', className, text);
+    return badge;
+}
+
+function getCurrentLanguage() {
+    return translations[document.documentElement.lang] ? document.documentElement.lang : 'fr';
+}
+
 function renderProjects(language) {
     const timeline = document.querySelector('#experience .timeline');
 
@@ -520,9 +590,18 @@ function renderProjects(language) {
         const date = createTextElement('div', 'timeline-date', getLocalizedValue(project.date, language));
         const content = document.createElement('div');
         content.className = 'timeline-content';
+        const headingRow = document.createElement('div');
+        headingRow.className = 'timeline-heading';
+        headingRow.append(createTextElement('h3', '', getLocalizedValue(project.title, language)));
+
+        const status = getLocalizedValue(project.status, language);
+
+        if (status) {
+            headingRow.append(createBadge('project-status', status));
+        }
 
         content.append(
-            createTextElement('h3', '', getLocalizedValue(project.title, language)),
+            headingRow,
             createTextElement('p', 'role', getLocalizedValue(project.role, language)),
             createTextElement('p', 'description', getLocalizedValue(project.description, language))
         );
@@ -560,7 +639,16 @@ function renderSkills(language) {
         const list = document.createElement('ul');
 
         category.items?.forEach((skill) => {
-            list.append(createTextElement('li', '', getLocalizedValue(skill, language)));
+            const item = document.createElement('li');
+            const label = createTextElement('span', 'skill-name', getSkillLabel(skill, language));
+            const level = getSkillLevel(skill, language);
+            item.append(label);
+
+            if (level) {
+                item.append(createBadge('skill-level', level));
+            }
+
+            list.append(item);
         });
 
         categoryElement.append(list);
@@ -661,6 +749,47 @@ function renderContact(language) {
     }
 }
 
+function renderCvAction(language) {
+    const printButton = document.getElementById('printCvButton');
+
+    if (!printButton) {
+        return;
+    }
+
+    const label = getLocalizedValue(portfolioData?.cv?.printLabel, language) || translations[language]?.cv?.printLabel || translations.fr.cv.printLabel;
+    printButton.textContent = label;
+}
+
+function setupAnalytics() {
+    document.querySelectorAll('[data-portfolio-analytics]').forEach((script) => script.remove());
+
+    const analytics = portfolioData?.analytics;
+
+    if (!analytics || analytics.provider === 'none') {
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.defer = true;
+    script.dataset.portfolioAnalytics = analytics.provider;
+
+    if (analytics.provider === 'plausible' && analytics.domain) {
+        script.src = analytics.scriptUrl || 'https://plausible.io/js/script.js';
+        script.dataset.domain = analytics.domain;
+    } else if (analytics.provider === 'umami' && analytics.siteId) {
+        script.src = analytics.scriptUrl || 'https://cloud.umami.is/script.js';
+        script.dataset.websiteId = analytics.siteId;
+    } else if (analytics.provider === 'goatcounter' && (analytics.scriptUrl || analytics.siteId)) {
+        script.src = 'https://gc.zgo.at/count.js';
+        script.dataset.goatcounter = analytics.scriptUrl || analytics.siteId;
+    } else {
+        return;
+    }
+
+    document.head.append(script);
+}
+
 function renderPortfolioSections(language) {
     renderProjects(language);
     renderSkills(language);
@@ -668,6 +797,8 @@ function renderPortfolioSections(language) {
     renderEducation(language);
     renderLanguages(language);
     renderContact(language);
+    renderCvAction(language);
+    setupAnalytics();
 }
 
 async function loadPortfolioData() {
@@ -706,6 +837,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const accessibilityPanel = document.getElementById('accessibilityPanel');
     const accessibilityClose = document.getElementById('accessibilityClose');
     const accessibilityReset = document.getElementById('accessibilityReset');
+    const printCvButton = document.getElementById('printCvButton');
+    const terminalForm = document.getElementById('terminalForm');
+    const terminalInput = document.getElementById('terminalInput');
+    const terminalOutput = document.getElementById('terminalOutput');
     const textSizeButtons = document.querySelectorAll('[data-a11y-text-option]');
     const contrastToggle = document.getElementById('contrastToggle');
     const motionToggle = document.getElementById('motionToggle');
@@ -826,40 +961,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return accessibilitySettings.reduceMotion || prefersReducedMotion();
     }
 
-    function triggerEasterEgg() {
-        document.querySelector('.easter-egg-terminal')?.remove();
+    function openEasterEgg(mode = 'build') {
+        const url = `easter-egg.html?mode=${encodeURIComponent(mode)}`;
+        const openedWindow = window.open(url, '_blank');
 
-        const currentLanguage = translations[document.documentElement.lang] ? document.documentElement.lang : 'fr';
-        const copy = translations[currentLanguage].easterEgg || translations.fr.easterEgg;
-        const terminal = document.createElement('div');
-        terminal.className = 'easter-egg-terminal';
-        terminal.setAttribute('role', 'status');
-        terminal.setAttribute('aria-live', 'polite');
-
-        const title = createTextElement('p', 'easter-egg-title', copy.title);
-        const lines = document.createElement('div');
-        lines.className = 'easter-egg-lines';
-
-        copy.lines.forEach((line) => {
-            lines.append(createTextElement('span', '', line));
-        });
-
-        const progress = document.createElement('div');
-        progress.className = 'easter-egg-progress';
-
-        const circuit = document.createElement('div');
-        circuit.className = 'easter-egg-circuit';
-
-        for (let index = 0; index < 5; index += 1) {
-            circuit.append(document.createElement('i'));
+        if (!openedWindow) {
+            window.location.href = url;
+        } else {
+            openedWindow.opener = null;
         }
-
-        terminal.append(title, lines, progress, circuit);
-        document.body.append(terminal);
-
-        window.setTimeout(() => {
-            terminal.remove();
-        }, shouldUseReducedMotion() ? 2600 : 5200);
     }
 
     // Tous les textes passent par data-i18n, ce qui évite de disperser les chaînes dans le HTML et le JS.
@@ -883,10 +993,119 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
+            const key = element.dataset.i18nPlaceholder;
+            const translatedText = getNestedValue(copy, key);
+
+            if (translatedText) {
+                element.placeholder = translatedText;
+            }
+        });
+
         languageSwitcher.value = selectedLanguage;
         localStorage.setItem('language', selectedLanguage);
         renderPortfolioSections(selectedLanguage);
+        resetTerminal();
         observeAnimatedItems();
+    }
+
+    function appendTerminalLine(text, type = 'output') {
+        if (!terminalOutput) {
+            return;
+        }
+
+        const line = document.createElement('div');
+        line.className = `terminal-line terminal-line-${type}`;
+        line.textContent = text;
+        terminalOutput.append(line);
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+
+    function resetTerminal() {
+        if (!terminalOutput) {
+            return;
+        }
+
+        terminalOutput.replaceChildren();
+        appendTerminalLine(translations[getCurrentLanguage()]?.terminal?.welcome || translations.fr.terminal.welcome, 'system');
+    }
+
+    function listTerminalSkills(language) {
+        if (!Array.isArray(portfolioData?.skills)) {
+            return 'portfolio-data.json pas encore chargé.';
+        }
+
+        return portfolioData.skills
+            .flatMap((category) => category.items || [])
+            .map((skill) => {
+                const label = getSkillLabel(skill, language);
+                const level = getSkillLevel(skill, language);
+                return level ? `${label} (${level})` : label;
+            })
+            .filter(Boolean)
+            .slice(0, 12)
+            .join(', ');
+    }
+
+    function listTerminalProjects(language) {
+        if (!Array.isArray(portfolioData?.projects)) {
+            return 'portfolio-data.json pas encore chargé.';
+        }
+
+        return portfolioData.projects
+            .map((project) => {
+                const status = getLocalizedValue(project.status, language);
+                const title = getLocalizedValue(project.title, language);
+                return status ? `${title} [${status}]` : title;
+            })
+            .filter(Boolean)
+            .join(' // ');
+    }
+
+    function handleTerminalCommand(rawCommand) {
+        const command = rawCommand.trim().toLowerCase();
+        const language = getCurrentLanguage();
+        const copy = translations[language]?.terminal || translations.fr.terminal;
+
+        if (!command) {
+            return;
+        }
+
+        appendTerminalLine(`> ${rawCommand}`, 'input');
+
+        if (command === 'clear') {
+            resetTerminal();
+            return;
+        }
+
+        if (command === 'help') {
+            appendTerminalLine(copy.help);
+        } else if (command === 'whoami') {
+            appendTerminalLine(copy.whoami);
+        } else if (command === 'skills') {
+            appendTerminalLine(listTerminalSkills(language));
+        } else if (command === 'projects') {
+            appendTerminalLine(listTerminalProjects(language));
+        } else if (command === 'status') {
+            appendTerminalLine('HTTP 200 // GitHub Pages // portfolio-data.json ready');
+        } else if (command === 'contact') {
+            appendTerminalLine(copy.contact);
+        } else if (command === 'cv') {
+            appendTerminalLine(copy.cv);
+            window.print();
+        } else if (['matrix', 'sudo hire me', 'arduino', '42', 'deploy'].includes(command)) {
+            const modeMap = {
+                matrix: 'matrix',
+                'sudo hire me': 'root',
+                arduino: 'circuit',
+                '42': 'answer',
+                deploy: 'deploy'
+            };
+            appendTerminalLine('opening hidden module...');
+            openEasterEgg(modeMap[command]);
+        } else {
+            appendTerminalLine(copy.unknown, 'error');
+        }
     }
 
     function observeAnimatedItems() {
@@ -900,7 +1119,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { selector: '.interests-list li', delay: 100 },
             { selector: '.education-item', delay: 150 },
             { selector: '.language', delay: 100 },
-            { selector: '.contact-form-card', delay: 150 }
+            { selector: '.contact-form-card', delay: 150 },
+            { selector: '.terminal-card', delay: 150 }
         ];
 
         animatedGroups.forEach(({ selector, delay }) => {
@@ -932,6 +1152,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     languageSwitcher.addEventListener('change', (event) => {
         applyLanguage(event.target.value);
+    });
+
+    printCvButton?.addEventListener('click', () => {
+        const pdfUrl = portfolioData?.cv?.pdfUrl?.trim();
+
+        if (pdfUrl) {
+            window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+        } else {
+            window.print();
+        }
+    });
+
+    terminalForm?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        handleTerminalCommand(terminalInput.value);
+        terminalInput.value = '';
     });
 
     accessibilityToggle?.addEventListener('click', (event) => {
@@ -1038,7 +1274,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (easterEggClicks >= 10) {
             easterEggClicks = 0;
-            triggerEasterEgg();
+            openEasterEgg('build');
             return;
         }
 

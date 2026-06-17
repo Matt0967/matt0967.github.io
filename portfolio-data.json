@@ -23,6 +23,11 @@
         "en": "Built an electronic module to evaluate Wi-Fi signal strength and reminder features.",
         "es": "Creación de un módulo electrónico para evaluar la intensidad de la red Wi-Fi y funciones de recordatorio."
       },
+      "status": {
+        "fr": "Prototype",
+        "en": "Prototype",
+        "es": "Prototipo"
+      },
       "tech": [
         "Arduino",
         "C",
@@ -54,6 +59,11 @@
         "fr": "Conception d'un contrôleur physique 6 touches programmable.",
         "en": "Designed a programmable 6-key physical controller.",
         "es": "Diseño de un controlador físico programable de 6 teclas."
+      },
+      "status": {
+        "fr": "Prototype",
+        "en": "Prototype",
+        "es": "Prototipo"
       },
       "tech": [
         "Arduino",
@@ -87,6 +97,11 @@
         "en": "Designed a time management system based on the Pomodoro technique.",
         "es": "Diseño de un sistema de gestión del tiempo basado en la técnica Pomodoro."
       },
+      "status": {
+        "fr": "Terminé",
+        "en": "Completed",
+        "es": "Terminado"
+      },
       "tech": [
         "Arduino",
         "C",
@@ -118,6 +133,11 @@
         "fr": "Installation et configuration de logiciels, résolution de problèmes simples, aide technique auprès de personnes.",
         "en": "Software setup and configuration, basic troubleshooting, and technical help for users.",
         "es": "Instalación y configuración de software, resolución de problemas simples y ayuda técnica a usuarios."
+      },
+      "status": {
+        "fr": "En cours",
+        "en": "Ongoing",
+        "es": "En curso"
       },
       "tech": [
         "Windows",
@@ -151,6 +171,11 @@
         "en": "Built task management and planning systems to improve structure, study routines, and work methods.",
         "es": "Creación de sistemas de gestión de tareas y planificación para mejorar la estructura, el estudio y los métodos de trabajo."
       },
+      "status": {
+        "fr": "En cours",
+        "en": "Ongoing",
+        "es": "En curso"
+      },
       "tech": [
         {
           "fr": "Gestion de projet",
@@ -179,11 +204,46 @@
         "es": "Lenguajes"
       },
       "items": [
-        "HTML",
-        "CSS",
-        "JavaScript",
-        "Python",
-        "Arduino"
+        {
+          "label": "HTML",
+          "level": {
+            "fr": "Intermédiaire",
+            "en": "Intermediate",
+            "es": "Intermedio"
+          }
+        },
+        {
+          "label": "CSS",
+          "level": {
+            "fr": "Intermédiaire",
+            "en": "Intermediate",
+            "es": "Intermedio"
+          }
+        },
+        {
+          "label": "JavaScript",
+          "level": {
+            "fr": "En apprentissage",
+            "en": "Learning",
+            "es": "En aprendizaje"
+          }
+        },
+        {
+          "label": "Python",
+          "level": {
+            "fr": "Bases solides",
+            "en": "Solid basics",
+            "es": "Bases sólidas"
+          }
+        },
+        {
+          "label": "Arduino",
+          "level": {
+            "fr": "Intermédiaire",
+            "en": "Intermediate",
+            "es": "Intermedio"
+          }
+        }
       ]
     },
     {
@@ -195,25 +255,81 @@
       },
       "items": [
         {
-          "fr": "Windows Serveur",
-          "en": "Windows Server",
-          "es": "Windows Server"
+          "label": {
+            "fr": "Windows Serveur",
+            "en": "Windows Server",
+            "es": "Windows Server"
+          },
+          "level": {
+            "fr": "Bases solides",
+            "en": "Solid basics",
+            "es": "Bases sólidas"
+          }
         },
         {
-          "fr": "yunohost Serveur",
-          "en": "yunohost Server",
-          "es": "Servidor yunohost"
+          "label": {
+            "fr": "yunohost Serveur",
+            "en": "yunohost Server",
+            "es": "Servidor yunohost"
+          },
+          "level": {
+            "fr": "En pratique",
+            "en": "Hands-on",
+            "es": "Práctico"
+          }
         },
         {
-          "fr": "Linux Serveur",
-          "en": "Linux Server",
-          "es": "Linux Server"
+          "label": {
+            "fr": "Linux Serveur",
+            "en": "Linux Server",
+            "es": "Linux Server"
+          },
+          "level": {
+            "fr": "Bases solides",
+            "en": "Solid basics",
+            "es": "Bases sólidas"
+          }
         },
-        "Docker",
-        "API",
-        "CLI",
-        "GitHub",
-        "Git"
+        {
+          "label": "Docker",
+          "level": {
+            "fr": "Découverte",
+            "en": "Exploring",
+            "es": "Explorando"
+          }
+        },
+        {
+          "label": "API",
+          "level": {
+            "fr": "En apprentissage",
+            "en": "Learning",
+            "es": "En aprendizaje"
+          }
+        },
+        {
+          "label": "CLI",
+          "level": {
+            "fr": "À l'aise",
+            "en": "Comfortable",
+            "es": "Cómodo"
+          }
+        },
+        {
+          "label": "GitHub",
+          "level": {
+            "fr": "À l'aise",
+            "en": "Comfortable",
+            "es": "Cómodo"
+          }
+        },
+        {
+          "label": "Git",
+          "level": {
+            "fr": "Bases solides",
+            "en": "Solid basics",
+            "es": "Bases sólidas"
+          }
+        }
       ]
     },
     {
@@ -225,29 +341,64 @@
       },
       "items": [
         {
-          "fr": "Soudure",
-          "en": "Soldering",
-          "es": "Soldadura"
+          "label": {
+            "fr": "Soudure",
+            "en": "Soldering",
+            "es": "Soldadura"
+          },
+          "level": {
+            "fr": "En pratique",
+            "en": "Hands-on",
+            "es": "Práctico"
+          }
         },
         {
-          "fr": "Création de machines",
-          "en": "Machine building",
-          "es": "Creación de máquinas"
+          "label": {
+            "fr": "Création de machines",
+            "en": "Machine building",
+            "es": "Creación de máquinas"
+          },
+          "level": {
+            "fr": "En pratique",
+            "en": "Hands-on",
+            "es": "Práctico"
+          }
         },
         {
-          "fr": "Gestion de machines virtuelles",
-          "en": "Virtual machine management",
-          "es": "Gestion de maquinas virtuales"
+          "label": {
+            "fr": "Gestion de machines virtuelles",
+            "en": "Virtual machine management",
+            "es": "Gestion de maquinas virtuales"
+          },
+          "level": {
+            "fr": "Bases solides",
+            "en": "Solid basics",
+            "es": "Bases sólidas"
+          }
         },
         {
-          "fr": "Diagnostic de machine physique",
-          "en": "Physical hardware diagnostics",
-          "es": "Diagnostico de hardware fisico"
+          "label": {
+            "fr": "Diagnostic de machine physique",
+            "en": "Physical hardware diagnostics",
+            "es": "Diagnostico de hardware fisico"
+          },
+          "level": {
+            "fr": "À l'aise",
+            "en": "Comfortable",
+            "es": "Cómodo"
+          }
         },
         {
-          "fr": "Montage de PC",
-          "en": "PC assembly",
-          "es": "Montaje de PC"
+          "label": {
+            "fr": "Montage de PC",
+            "en": "PC assembly",
+            "es": "Montaje de PC"
+          },
+          "level": {
+            "fr": "À l'aise",
+            "en": "Comfortable",
+            "es": "Cómodo"
+          }
         }
       ]
     }
@@ -421,5 +572,19 @@
       "en": "Open the Notion form",
       "es": "Abrir el formulario de Notion"
     }
+  },
+  "cv": {
+    "pdfUrl": "",
+    "printLabel": {
+      "fr": "Exporter le CV en PDF",
+      "en": "Export resume as PDF",
+      "es": "Exportar CV en PDF"
+    }
+  },
+  "analytics": {
+    "provider": "none",
+    "domain": "",
+    "siteId": "",
+    "scriptUrl": ""
   }
 }

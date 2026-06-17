@@ -5,9 +5,10 @@ Le site reste compatible GitHub Pages: il n'y a pas de backend.
 ## Utilisation
 
 1. Ouvre `admin.html`.
-2. Modifie les projets, les compétences, les centres d'intérêt, les formations ou les langues.
+2. Modifie les projets, les statuts, les compétences avec niveaux, les centres d'intérêt, les formations ou les langues.
 3. Dans `Contact`, colle l'URL publique de ton formulaire Notion.
-4. Sauvegarde en brouillon local, télécharge `portfolio-data.json`, ou publie directement via l'onglet `Publication`.
+4. Dans `Publication`, vérifie l'aperçu avant publication si besoin.
+5. Sauvegarde en brouillon local, télécharge `portfolio-data.json`, ou publie directement via l'onglet `Publication`.
 
 ## Verrouillage du dashboard
 
@@ -20,6 +21,16 @@ Limite importante: GitHub Pages reste un hébergement statique. Quelqu'un qui co
 L'onglet `Stats` lit la GitHub Traffic API avec ton token GitHub. Il affiche les vues et visiteurs uniques disponibles côté GitHub, les clones, les sources de trafic, les pages populaires et une heatmap sur la fenêtre fournie par GitHub.
 
 Limites GitHub: les données de trafic sont limitées aux 14 derniers jours et ne donnent pas une carte géographique temps réel des visiteurs du site. Pour de vraies statistiques web détaillées, il faudrait ajouter un service d'analytics externe compatible avec un site statique.
+
+L'onglet permet aussi de configurer un analytics public optionnel: Plausible, Umami ou GoatCounter. Ne mets jamais de token secret dans ces champs: uniquement un domaine public, un site ID public ou une URL de script publique.
+
+## CV PDF
+
+Le bouton PDF du portfolio utilise l'impression navigateur si aucune URL de PDF n'est renseignée. Dans la fenêtre d'impression, choisis `Enregistrer en PDF`. Si tu préfères un fichier PDF fixe, ajoute son URL dans l'onglet `Publication`.
+
+## Mini terminal et easter eggs
+
+Le portfolio contient un mini terminal côté navigateur. Les commandes utiles sont visibles via `help`; certains déclencheurs ouvrent une page cachée full screen dans un nouvel onglet. Tout reste statique et compatible GitHub Pages.
 
 ## Contact Notion
 

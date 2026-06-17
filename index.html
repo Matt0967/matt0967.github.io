@@ -18,6 +18,7 @@
                     <a href="#experience" data-i18n="nav.experience">Expérience</a>
                     <a href="#skills" data-i18n="nav.skills">Compétences</a>
                     <a href="#contact" data-i18n="nav.contact">Contact</a>
+                    <a href="#terminal" data-i18n="nav.terminal">Terminal</a>
                 </div>
                 <!-- Les contrôles globaux restent groupés pour simplifier l'UX dans la navbar. -->
                 <div class="nav-controls">
@@ -106,6 +107,7 @@
                     <a href="https://github.com/Matt0967" target="_blank" rel="noreferrer" class="btn">
                         GitHub
                     </a>
+                    <button class="btn btn-secondary" id="printCvButton" type="button" data-i18n="cv.printLabel">Exporter le CV en PDF</button>
                 </div>
             </div>
             <div class="scroll-indicator"></div>
@@ -305,6 +307,25 @@
                 <h2 class="section-title" data-i18n="contact.title">// Contact //</h2>
                 <div id="contactFormMount" class="contact-form-card">
                     <p class="contact-form-placeholder" data-i18n="contact.formPlaceholder">Formulaire Notion à configurer.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="terminal" class="section terminal-section">
+            <div class="container">
+                <h2 class="section-title" data-i18n="terminal.title">// Terminal //</h2>
+                <div class="terminal-card" id="portfolioTerminal">
+                    <div class="terminal-toolbar" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="terminal-output" id="terminalOutput" aria-live="polite"></div>
+                    <form class="terminal-input-row" id="terminalForm">
+                        <label class="sr-only" for="terminalInput" data-i18n="terminal.inputLabel">Commande terminal</label>
+                        <span aria-hidden="true">&gt;</span>
+                        <input id="terminalInput" autocomplete="off" spellcheck="false" data-i18n-placeholder="terminal.placeholder" placeholder="help">
+                    </form>
                 </div>
             </div>
         </section>

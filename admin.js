@@ -54,6 +54,22 @@ function getLocalizedValue(value, locale) {
     return '';
 }
 
+function getSkillLabel(skill, locale) {
+    if (skill && typeof skill === 'object' && 'label' in skill) {
+        return getLocalizedValue(skill.label, locale);
+    }
+
+    return getLocalizedValue(skill, locale);
+}
+
+function getSkillLevel(skill, locale) {
+    if (skill && typeof skill === 'object' && 'level' in skill) {
+        return getLocalizedValue(skill.level, locale);
+    }
+
+    return '';
+}
+
 function setLocalizedValue(record, key, locale, value) {
     if (!record[key] || typeof record[key] === 'string') {
         const previousValue = record[key] || '';
@@ -102,7 +118,7 @@ function dedupeLocalizedList(list) {
 
     return (Array.isArray(list) ? list : []).filter((item) => {
         const values = LOCALES
-            .map((locale) => getLocalizedValue(item, locale).trim().toLowerCase())
+            .map((locale) => getSkillLabel(item, locale).trim().toLowerCase())
             .filter(Boolean);
         const key = values[0] || '';
 
@@ -370,6 +386,69 @@ function renderLocalizedListInputs(record, key, label) {
     });
 }
 
+function getSkillListText(list, locale) {
+    return (list || [])
+        .map((skill) => {
+            const label = getSkillLabel(skill, locale);
+            const level = getSkillLevel(skill, locale);
+            return level ? `${label} | ${level}` : label;
+        })
+        .filter(Boolean)
+        .join('\n');
+}
+
+function setSkillList(record, locale, text) {
+    const nextValues = text.split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+            const [label, ...levelParts] = line.split('|');
+            return {
+                label: label.trim(),
+                level: levelParts.join('|').trim()
+            };
+        })
+        .filter((item) => item.label);
+
+    record.items = nextValues.map((nextValue, index) => {
+        const existing = record.items?.[index];
+        const label = emptyLocalizedValue();
+        const level = emptyLocalizedValue();
+
+        LOCALES.forEach((availableLocale) => {
+            label[availableLocale] = getSkillLabel(existing, availableLocale);
+            level[availableLocale] = getSkillLevel(existing, availableLocale);
+        });
+
+        label[locale] = nextValue.label;
+        level[locale] = nextValue.level;
+
+        return { label, level };
+    });
+}
+
+function renderSkillListInputs(record) {
+    return LOCALES.map((locale) => {
+        const inputId = `${record.id}-skills-${locale}`;
+        const field = document.createElement('div');
+        field.className = 'field';
+
+        const labelElement = document.createElement('label');
+        labelElement.setAttribute('for', inputId);
+        labelElement.textContent = `Compétences (${locale.toUpperCase()}, une par ligne: Nom | Niveau)`;
+
+        const input = document.createElement('textarea');
+        input.id = inputId;
+        input.value = getSkillListText(record.items, locale);
+        input.addEventListener('input', () => {
+            setSkillList(record, locale, input.value);
+        });
+
+        field.append(labelElement, input);
+        return field;
+    });
+}
+
 function createButton(label, className, onClick) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -437,6 +516,7 @@ function renderProjects() {
         renderLocalizedInputs(project, 'date', 'Date').forEach((field) => body.append(field));
         renderLocalizedInputs(project, 'title', 'Titre').forEach((field) => body.append(field));
         renderLocalizedInputs(project, 'role', 'Rôle').forEach((field) => body.append(field));
+        renderLocalizedInputs(project, 'status', 'Statut').forEach((field) => body.append(field));
         renderLocalizedInputs(project, 'description', 'Description', true).forEach((field) => body.append(field));
         renderLocalizedListInputs(project, 'tech', 'Technos').forEach((field) => body.append(field));
 
@@ -468,7 +548,7 @@ function renderSkills() {
         const body = document.createElement('div');
         body.className = 'field-grid';
         renderLocalizedInputs(category, 'title', 'Nom de catégorie').forEach((field) => body.append(field));
-        renderLocalizedListInputs(category, 'items', 'Compétences').forEach((field) => body.append(field));
+        renderSkillListInputs(category).forEach((field) => body.append(field));
 
         editor.append(createEditorCard(
             getLocalizedValue(category.title, 'fr'),
@@ -645,6 +725,7 @@ function renderContactSettings() {
 
 function renderPublish() {
     const savedConfig = JSON.parse(localStorage.getItem(GITHUB_CONFIG_KEY) || '{}');
+    state.data.cv = state.data.cv || { pdfUrl: '', printLabel: emptyLocalizedValue() };
     tabEyebrow.textContent = 'GitHub Pages';
     tabTitle.textContent = 'Publication';
     addButton.hidden = true;
@@ -653,6 +734,16 @@ function renderPublish() {
     const panel = document.createElement('section');
     panel.className = 'publish-panel';
     panel.innerHTML = `
+        <div class="settings-block">
+            <h3>CV / PDF</h3>
+            <div class="field-grid">
+                <div class="field full">
+                    <label for="cvPdfUrl">URL d'un PDF existant (optionnel)</label>
+                    <input id="cvPdfUrl" type="url" placeholder="assets/cv.pdf ou https://...">
+                </div>
+                <div id="cvLabelFields" class="field-grid full"></div>
+            </div>
+        </div>
         <div class="publish-grid">
             <div class="field">
                 <label for="githubOwner">Propriétaire GitHub</label>
@@ -681,6 +772,13 @@ function renderPublish() {
         </div>
     `;
 
+    panel.querySelector('#cvPdfUrl').value = state.data.cv.pdfUrl || '';
+    panel.querySelector('#cvPdfUrl').addEventListener('input', (event) => {
+        state.data.cv.pdfUrl = event.target.value.trim();
+    });
+    const cvLabelFields = panel.querySelector('#cvLabelFields');
+    renderLocalizedInputs(state.data.cv, 'printLabel', 'Libellé du bouton PDF').forEach((field) => cvLabelFields.append(field));
+
     panel.querySelector('#githubOwner').value = savedConfig.owner || 'Matt0967';
     panel.querySelector('#githubRepo').value = savedConfig.repo || 'portefolio';
     panel.querySelector('#githubBranch').value = savedConfig.branch || 'main';
@@ -692,15 +790,23 @@ function renderPublish() {
     actions.className = 'toolbar-actions';
     actions.append(
         createButton('Tester la configuration', 'secondary-button', testGitHubConfig),
+        createButton('Aperçu avant publication', 'secondary-button', renderPublicationPreview),
         createButton('Publier sur GitHub', 'primary-button', publishToGitHub)
     );
 
+    const previewMount = document.createElement('div');
+    previewMount.id = 'publishPreview';
+    previewMount.className = 'preview-panel';
+    previewMount.append(createEmptyState('Aucun aperçu généré.'));
+
     panel.append(actions);
+    panel.append(previewMount);
     editor.append(panel);
 }
 
 function renderStats() {
     const savedConfig = JSON.parse(localStorage.getItem(GITHUB_CONFIG_KEY) || '{}');
+    state.data.analytics = state.data.analytics || { provider: 'none', domain: '', siteId: '', scriptUrl: '' };
     tabEyebrow.textContent = 'Trafic GitHub';
     tabTitle.textContent = 'Stats';
     addButton.hidden = true;
@@ -710,6 +816,33 @@ function renderStats() {
     panel.className = 'publish-panel';
     panel.innerHTML = `
         <p class="dashboard-note">GitHub ne donne les stats de trafic que pour les 14 derniers jours et seulement avec un token autorisé sur le dépôt. Sans backend, il n'y a pas de compteur de visites permanent fiable.</p>
+        <div class="settings-block">
+            <h3>Analytics public optionnel</h3>
+            <p class="dashboard-note">Configure Plausible, Umami ou GoatCounter si tu veux de vraies stats de visite du site. Aucun token secret ne doit être mis ici.</p>
+            <div class="publish-grid">
+                <div class="field">
+                    <label for="analyticsProvider">Provider</label>
+                    <select id="analyticsProvider">
+                        <option value="none">Aucun</option>
+                        <option value="plausible">Plausible</option>
+                        <option value="umami">Umami</option>
+                        <option value="goatcounter">GoatCounter</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="analyticsDomain">Domaine Plausible</label>
+                    <input id="analyticsDomain" placeholder="matt0967.github.io">
+                </div>
+                <div class="field">
+                    <label for="analyticsSiteId">Site ID / endpoint</label>
+                    <input id="analyticsSiteId" placeholder="ID Umami ou URL GoatCounter">
+                </div>
+                <div class="field">
+                    <label for="analyticsScriptUrl">Script URL optionnelle</label>
+                    <input id="analyticsScriptUrl" placeholder="https://.../script.js">
+                </div>
+            </div>
+        </div>
         <div class="publish-grid">
             <div class="field">
                 <label for="statsOwner">Propriétaire GitHub</label>
@@ -729,6 +862,23 @@ function renderStats() {
             </label>
         </div>
     `;
+
+    panel.querySelector('#analyticsProvider').value = state.data.analytics.provider || 'none';
+    panel.querySelector('#analyticsDomain').value = state.data.analytics.domain || '';
+    panel.querySelector('#analyticsSiteId').value = state.data.analytics.siteId || '';
+    panel.querySelector('#analyticsScriptUrl').value = state.data.analytics.scriptUrl || '';
+    panel.querySelector('#analyticsProvider').addEventListener('change', (event) => {
+        state.data.analytics.provider = event.target.value;
+    });
+    panel.querySelector('#analyticsDomain').addEventListener('input', (event) => {
+        state.data.analytics.domain = event.target.value.trim();
+    });
+    panel.querySelector('#analyticsSiteId').addEventListener('input', (event) => {
+        state.data.analytics.siteId = event.target.value.trim();
+    });
+    panel.querySelector('#analyticsScriptUrl').addEventListener('input', (event) => {
+        state.data.analytics.scriptUrl = event.target.value.trim();
+    });
 
     panel.querySelector('#statsOwner').value = savedConfig.owner || 'Matt0967';
     panel.querySelector('#statsRepo').value = savedConfig.repo || 'portefolio';
@@ -917,6 +1067,53 @@ async function loadGitHubStats() {
     }
 }
 
+function renderPublicationPreview() {
+    const mount = document.getElementById('publishPreview');
+
+    if (!mount) {
+        return;
+    }
+
+    const summary = document.createElement('div');
+    summary.className = 'preview-summary';
+    summary.append(
+        createStatCard(String(state.data.projects.length), 'projets'),
+        createStatCard(String(state.data.skills.length), 'catégories de compétences'),
+        createStatCard(String(state.data.interests.length), 'centres d’intérêt'),
+        createStatCard(String(state.data.education.length), 'formations')
+    );
+
+    const projectList = document.createElement('div');
+    projectList.className = 'stats-list';
+    state.data.projects.slice(0, 5).forEach((project) => {
+        const row = document.createElement('div');
+        row.className = 'stats-row';
+        row.append(
+            createText('span', getLocalizedValue(project.title, 'fr') || 'Projet sans titre'),
+            createText('strong', getLocalizedValue(project.status, 'fr') || 'Sans statut')
+        );
+        projectList.append(row);
+    });
+
+    const meta = document.createElement('p');
+    meta.className = 'dashboard-note';
+    meta.textContent = `Analytics: ${state.data.analytics?.provider || 'none'} // PDF: ${state.data.cv?.pdfUrl ? 'fichier externe' : 'export navigateur'}`;
+
+    const jsonPreview = document.createElement('pre');
+    jsonPreview.className = 'json-preview';
+    jsonPreview.textContent = serializeData();
+
+    mount.replaceChildren(
+        createText('h3', 'Aperçu du contenu à publier'),
+        summary,
+        createText('h3', 'Projets visibles'),
+        projectList,
+        meta,
+        jsonPreview
+    );
+    setStatus('Aperçu généré depuis les données actuelles.', 'ready');
+}
+
 function createEmptyState(text) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
@@ -961,6 +1158,7 @@ function addCurrentItem() {
             date: emptyLocalizedValue(),
             title: emptyLocalizedValue(),
             role: emptyLocalizedValue(),
+            status: emptyLocalizedValue(),
             description: emptyLocalizedValue(),
             tech: []
         }),
@@ -1026,7 +1224,10 @@ function importJson(file) {
 function normalizeData(data) {
     return {
         schemaVersion: data.schemaVersion || 1,
-        projects: Array.isArray(data.projects) ? data.projects : [],
+        projects: (Array.isArray(data.projects) ? data.projects : []).map((project) => ({
+            ...project,
+            status: project.status || emptyLocalizedValue()
+        })),
         skills: normalizeSkills(data.skills),
         interests: Array.isArray(data.interests) ? data.interests : [],
         education: Array.isArray(data.education) ? data.education : [],
@@ -1035,6 +1236,24 @@ function normalizeData(data) {
             notionFormUrl: '',
             iframeTitle: emptyLocalizedValue(),
             openLabel: emptyLocalizedValue()
+        },
+        cv: data.cv && typeof data.cv === 'object' ? {
+            pdfUrl: data.cv.pdfUrl || '',
+            printLabel: data.cv.printLabel || emptyLocalizedValue()
+        } : {
+            pdfUrl: '',
+            printLabel: emptyLocalizedValue()
+        },
+        analytics: data.analytics && typeof data.analytics === 'object' ? {
+            provider: data.analytics.provider || 'none',
+            domain: data.analytics.domain || '',
+            siteId: data.analytics.siteId || '',
+            scriptUrl: data.analytics.scriptUrl || ''
+        } : {
+            provider: 'none',
+            domain: '',
+            siteId: '',
+            scriptUrl: ''
         }
     };
 }
