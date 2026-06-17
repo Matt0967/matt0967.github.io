@@ -2,7 +2,11 @@ const DATA_PATH = 'portfolio-data.json';
 const DRAFT_KEY = 'portfolio-admin-draft';
 const GITHUB_CONFIG_KEY = 'portfolio-admin-github-config';
 const GITHUB_TOKEN_KEY = 'portfolio-admin-github-token';
+const AUTH_HASH_KEY = 'portfolio-admin-password-hash';
+const AUTH_SALT_KEY = 'portfolio-admin-password-salt';
+const AUTH_SESSION_KEY = 'portfolio-admin-session-unlocked';
 const LOCALES = ['fr', 'en', 'es'];
+const PBKDF2_ITERATIONS = 210000;
 
 const state = {
     data: null,
@@ -17,6 +21,19 @@ const statusText = document.getElementById('statusText');
 const tabTitle = document.getElementById('tabTitle');
 const tabEyebrow = document.getElementById('tabEyebrow');
 const jsonFileInput = document.getElementById('jsonFileInput');
+const authScreen = document.getElementById('authScreen');
+const authPassword = document.getElementById('authPassword');
+const authCurrentPassword = document.getElementById('authCurrentPassword');
+const authConfirmPassword = document.getElementById('authConfirmPassword');
+const authCurrentPasswordField = document.getElementById('authCurrentPasswordField');
+const authConfirmField = document.getElementById('authConfirmField');
+const authSubmit = document.getElementById('authSubmit');
+const authChangePassword = document.getElementById('authChangePassword');
+const authCancelChange = document.getElementById('authCancelChange');
+const authError = document.getElementById('authError');
+const authHelp = document.getElementById('authHelp');
+const lockButton = document.getElementById('lockButton');
+let authMode = localStorage.getItem(AUTH_HASH_KEY) ? 'unlock' : 'setup';
 
 function emptyLocalizedValue() {
     return LOCALES.reduce((copy, locale) => {
@@ -107,6 +124,180 @@ function normalizeSkills(skills) {
 
 function createId(prefix) {
     return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function bytesToBase64(bytes) {
+    let binary = '';
+    bytes.forEach((byte) => {
+        binary += String.fromCharCode(byte);
+    });
+    return btoa(binary);
+}
+
+function base64ToBytes(value) {
+    return Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
+}
+
+async function hashPassword(password, salt) {
+    const passwordKey = await crypto.subtle.importKey(
+        'raw',
+        new TextEncoder().encode(password),
+        'PBKDF2',
+        false,
+        ['deriveBits']
+    );
+    const bits = await crypto.subtle.deriveBits(
+        {
+            name: 'PBKDF2',
+            hash: 'SHA-256',
+            salt,
+            iterations: PBKDF2_ITERATIONS
+        },
+        passwordKey,
+        256
+    );
+
+    return bytesToBase64(new Uint8Array(bits));
+}
+
+function timingSafeEqual(left, right) {
+    if (left.length !== right.length) {
+        return false;
+    }
+
+    let diff = 0;
+
+    for (let index = 0; index < left.length; index += 1) {
+        diff |= left.charCodeAt(index) ^ right.charCodeAt(index);
+    }
+
+    return diff === 0;
+}
+
+function hasLocalPassword() {
+    return Boolean(localStorage.getItem(AUTH_HASH_KEY) && localStorage.getItem(AUTH_SALT_KEY));
+}
+
+function setAuthError(message = '') {
+    authError.textContent = message;
+}
+
+function clearAuthInputs() {
+    authPassword.value = '';
+    authConfirmPassword.value = '';
+    authCurrentPassword.value = '';
+}
+
+function updateAuthScreen() {
+    const hasPassword = hasLocalPassword();
+
+    if (!hasPassword) {
+        authMode = 'setup';
+    }
+
+    const setupMode = authMode === 'setup';
+    const changeMode = authMode === 'change';
+    authConfirmField.hidden = !setupMode && !changeMode;
+    authCurrentPasswordField.hidden = !changeMode;
+    authChangePassword.hidden = !hasPassword || changeMode;
+    authCancelChange.hidden = !changeMode;
+    authSubmit.textContent = setupMode ? 'Créer le mot de passe' : changeMode ? 'Changer le mot de passe' : 'Déverrouiller';
+    authPassword.autocomplete = setupMode || changeMode ? 'new-password' : 'current-password';
+    authHelp.textContent = setupMode
+        ? 'Choisis un mot de passe local pour ce navigateur. Il ne sera pas écrit dans le code du site.'
+        : changeMode
+            ? 'Saisis l’ancien mot de passe, puis le nouveau. Le hash local sera remplacé.'
+            : 'Saisis le mot de passe local de ce navigateur. La publication GitHub demandera toujours un token valide.';
+}
+
+async function verifyPassword(password) {
+    const savedHash = localStorage.getItem(AUTH_HASH_KEY);
+    const savedSalt = localStorage.getItem(AUTH_SALT_KEY);
+
+    if (!savedHash || !savedSalt) {
+        return false;
+    }
+
+    const nextHash = await hashPassword(password, base64ToBytes(savedSalt));
+    return timingSafeEqual(nextHash, savedHash);
+}
+
+async function savePassword(password) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const hash = await hashPassword(password, salt);
+    localStorage.setItem(AUTH_SALT_KEY, bytesToBase64(salt));
+    localStorage.setItem(AUTH_HASH_KEY, hash);
+}
+
+function unlockDashboard() {
+    sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
+    document.body.classList.remove('auth-locked');
+    clearAuthInputs();
+    setAuthError();
+    loadInitialData();
+}
+
+function lockDashboard() {
+    sessionStorage.removeItem(AUTH_SESSION_KEY);
+    document.body.classList.add('auth-locked');
+    updateAuthScreen();
+    window.setTimeout(() => authPassword.focus(), 0);
+}
+
+function validatePasswordStrength(password) {
+    if (password.length < 10) {
+        return 'Utilise au moins 10 caractères.';
+    }
+
+    if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+        return 'Mélange au moins lettres et chiffres.';
+    }
+
+    return '';
+}
+
+async function handleAuthSubmit() {
+    const password = authPassword.value;
+    setAuthError();
+
+    try {
+        if (!window.crypto?.subtle) {
+            setAuthError('Web Crypto est indisponible ici. Ouvre le dashboard depuis GitHub Pages en HTTPS pour activer le verrouillage.');
+            return;
+        }
+
+        if (authMode === 'unlock') {
+            if (await verifyPassword(password)) {
+                unlockDashboard();
+            } else {
+                setAuthError('Mot de passe incorrect.');
+            }
+            return;
+        }
+
+        if (authMode === 'change' && !(await verifyPassword(authCurrentPassword.value))) {
+            setAuthError('Mot de passe actuel incorrect.');
+            return;
+        }
+
+        const strengthError = validatePasswordStrength(password);
+
+        if (strengthError) {
+            setAuthError(strengthError);
+            return;
+        }
+
+        if (password !== authConfirmPassword.value) {
+            setAuthError('La confirmation ne correspond pas.');
+            return;
+        }
+
+        await savePassword(password);
+        authMode = 'unlock';
+        unlockDashboard();
+    } catch (error) {
+        setAuthError('Verrouillage indisponible dans ce navigateur.');
+    }
 }
 
 function setStatus(message, type = 'ready') {
@@ -508,6 +699,224 @@ function renderPublish() {
     editor.append(panel);
 }
 
+function renderStats() {
+    const savedConfig = JSON.parse(localStorage.getItem(GITHUB_CONFIG_KEY) || '{}');
+    tabEyebrow.textContent = 'Trafic GitHub';
+    tabTitle.textContent = 'Stats';
+    addButton.hidden = true;
+    editor.replaceChildren();
+
+    const panel = document.createElement('section');
+    panel.className = 'publish-panel';
+    panel.innerHTML = `
+        <p class="dashboard-note">GitHub ne donne les stats de trafic que pour les 14 derniers jours et seulement avec un token autorisé sur le dépôt. Sans backend, il n'y a pas de compteur de visites permanent fiable.</p>
+        <div class="publish-grid">
+            <div class="field">
+                <label for="statsOwner">Propriétaire GitHub</label>
+                <input id="statsOwner" autocomplete="username">
+            </div>
+            <div class="field">
+                <label for="statsRepo">Dépôt</label>
+                <input id="statsRepo">
+            </div>
+            <div class="field full">
+                <label for="statsToken">Token GitHub personnel</label>
+                <input id="statsToken" type="password" autocomplete="off">
+            </div>
+            <label class="checkbox-row field full">
+                <input id="statsRememberToken" type="checkbox">
+                Réutiliser ce token dans ce navigateur
+            </label>
+        </div>
+    `;
+
+    panel.querySelector('#statsOwner').value = savedConfig.owner || 'Matt0967';
+    panel.querySelector('#statsRepo').value = savedConfig.repo || 'portefolio';
+    panel.querySelector('#statsToken').value = localStorage.getItem(GITHUB_TOKEN_KEY) || '';
+    panel.querySelector('#statsRememberToken').checked = Boolean(localStorage.getItem(GITHUB_TOKEN_KEY));
+
+    const actions = document.createElement('div');
+    actions.className = 'toolbar-actions';
+    actions.append(createButton('Rafraîchir les stats', 'primary-button', loadGitHubStats));
+
+    const statsMount = document.createElement('div');
+    statsMount.id = 'statsMount';
+    statsMount.append(createEmptyState('Renseigne le token puis rafraîchis les stats.'));
+
+    panel.append(actions, statsMount);
+    editor.append(panel);
+}
+
+function collectStatsConfig() {
+    const config = {
+        owner: document.getElementById('statsOwner')?.value.trim(),
+        repo: document.getElementById('statsRepo')?.value.trim()
+    };
+    const token = document.getElementById('statsToken')?.value.trim();
+    const rememberToken = document.getElementById('statsRememberToken')?.checked;
+
+    if (!config.owner || !config.repo || !token) {
+        throw new Error('Configuration stats incomplète.');
+    }
+
+    const savedConfig = JSON.parse(localStorage.getItem(GITHUB_CONFIG_KEY) || '{}');
+    localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify({ ...savedConfig, owner: config.owner, repo: config.repo }));
+
+    if (rememberToken) {
+        localStorage.setItem(GITHUB_TOKEN_KEY, token);
+    } else {
+        localStorage.removeItem(GITHUB_TOKEN_KEY);
+    }
+
+    return { ...config, token };
+}
+
+async function fetchGitHubJson(url, token, fallback) {
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/vnd.github+json'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(await createGitHubErrorMessage(response, fallback));
+    }
+
+    return response.json();
+}
+
+function createStatCard(value, label) {
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    card.append(createText('strong', value), createText('span', label));
+    return card;
+}
+
+function createText(tagName, text) {
+    const element = document.createElement(tagName);
+    element.textContent = text;
+    return element;
+}
+
+function renderTrafficChart(days) {
+    const chart = document.createElement('div');
+    chart.className = 'traffic-chart';
+    const maxCount = Math.max(1, ...days.map((day) => day.count || 0));
+
+    days.forEach((day) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'traffic-bar-wrap';
+        wrapper.title = `${new Date(day.timestamp).toLocaleDateString('fr-FR')}: ${day.count || 0} vues, ${day.uniques || 0} visiteurs`;
+
+        const bar = document.createElement('div');
+        bar.className = 'traffic-bar';
+        bar.style.height = `${Math.max(8, ((day.count || 0) / maxCount) * 120)}px`;
+
+        const label = document.createElement('span');
+        label.className = 'traffic-bar-label';
+        label.textContent = new Date(day.timestamp).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+
+        wrapper.append(bar, label);
+        chart.append(wrapper);
+    });
+
+    return chart;
+}
+
+function renderHeatmap(days) {
+    const heatmap = document.createElement('div');
+    heatmap.className = 'heatmap';
+    const maxCount = Math.max(1, ...days.map((day) => day.count || 0));
+
+    days.forEach((day) => {
+        const cell = document.createElement('span');
+        const ratio = (day.count || 0) / maxCount;
+        const level = ratio === 0 ? 0 : ratio < 0.25 ? 1 : ratio < 0.5 ? 2 : ratio < 0.75 ? 3 : 4;
+        cell.className = 'heatmap-cell';
+        cell.dataset.level = String(level);
+        cell.title = `${new Date(day.timestamp).toLocaleDateString('fr-FR')}: ${day.count || 0} vues`;
+        heatmap.append(cell);
+    });
+
+    return heatmap;
+}
+
+function renderStatsList(title, items, primaryKey, valueKey) {
+    const section = document.createElement('section');
+    section.className = 'stats-section';
+    section.append(createText('h3', title));
+
+    const list = document.createElement('div');
+    list.className = 'stats-list';
+
+    if (!items.length) {
+        list.append(createEmptyState('Aucune donnée disponible.'));
+    }
+
+    items.slice(0, 8).forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'stats-row';
+        row.append(createText('span', item[primaryKey] || 'Inconnu'), createText('strong', String(item[valueKey] || 0)));
+        list.append(row);
+    });
+
+    section.append(list);
+    return section;
+}
+
+async function loadGitHubStats() {
+    const mount = document.getElementById('statsMount');
+
+    try {
+        const config = collectStatsConfig();
+        mount.replaceChildren(createEmptyState('Chargement des stats GitHub...'));
+        const baseUrl = `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}`;
+
+        const [repo, views, clones, referrers, paths] = await Promise.all([
+            fetchGitHubJson(baseUrl, config.token, 'Dépôt GitHub inaccessible'),
+            fetchGitHubJson(`${baseUrl}/traffic/views`, config.token, 'Stats de vues indisponibles'),
+            fetchGitHubJson(`${baseUrl}/traffic/clones`, config.token, 'Stats de clones indisponibles'),
+            fetchGitHubJson(`${baseUrl}/traffic/popular/referrers`, config.token, 'Referrers indisponibles'),
+            fetchGitHubJson(`${baseUrl}/traffic/popular/paths`, config.token, 'Pages populaires indisponibles')
+        ]);
+
+        const summary = document.createElement('div');
+        summary.className = 'stats-grid';
+        summary.append(
+            createStatCard(String(views.count || 0), 'vues sur 14 jours'),
+            createStatCard(String(views.uniques || 0), 'visiteurs uniques'),
+            createStatCard(String(clones.count || 0), 'clones du dépôt'),
+            createStatCard(String(repo.stargazers_count || 0), 'étoiles GitHub')
+        );
+
+        const chartSection = document.createElement('section');
+        chartSection.className = 'stats-section';
+        chartSection.append(createText('h3', 'Vues par jour'), renderTrafficChart(views.views || []));
+
+        const heatmapSection = document.createElement('section');
+        heatmapSection.className = 'stats-section';
+        heatmapSection.append(createText('h3', 'Heatmap live des visites'), renderHeatmap(views.views || []));
+
+        const updated = document.createElement('p');
+        updated.className = 'stats-updated';
+        updated.textContent = `Dernier rafraîchissement: ${new Date().toLocaleString('fr-FR')}. Données fournies par GitHub Traffic API.`;
+
+        mount.replaceChildren(
+            summary,
+            chartSection,
+            heatmapSection,
+            renderStatsList('Sources de trafic', referrers || [], 'referrer', 'count'),
+            renderStatsList('Pages les plus vues', paths || [], 'path', 'count'),
+            updated
+        );
+        setStatus('Stats GitHub chargées.', 'ready');
+    } catch (error) {
+        mount.replaceChildren(createEmptyState(error.message));
+        setStatus(error.message, 'error');
+    }
+}
+
 function createEmptyState(text) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
@@ -533,6 +942,7 @@ function render() {
         education: renderEducation,
         languages: renderLanguages,
         contact: renderContactSettings,
+        stats: renderStats,
         publish: renderPublish
     };
 
@@ -829,6 +1239,38 @@ document.querySelectorAll('.tab').forEach((tab) => {
     });
 });
 
+authSubmit.addEventListener('click', handleAuthSubmit);
+authPassword.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        handleAuthSubmit();
+    }
+});
+authConfirmPassword.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        handleAuthSubmit();
+    }
+});
+authCurrentPassword.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        handleAuthSubmit();
+    }
+});
+authChangePassword.addEventListener('click', () => {
+    authMode = 'change';
+    clearAuthInputs();
+    setAuthError();
+    updateAuthScreen();
+    authCurrentPassword.focus();
+});
+authCancelChange.addEventListener('click', () => {
+    authMode = 'unlock';
+    clearAuthInputs();
+    setAuthError();
+    updateAuthScreen();
+    authPassword.focus();
+});
+lockButton.addEventListener('click', lockDashboard);
+
 addButton.addEventListener('click', addCurrentItem);
 document.getElementById('saveDraftButton').addEventListener('click', saveDraft);
 document.getElementById('downloadButton').addEventListener('click', downloadJson);
@@ -841,4 +1283,17 @@ jsonFileInput.addEventListener('change', (event) => {
     }
 });
 
-loadInitialData();
+function initAdmin() {
+    updateAuthScreen();
+
+    if (sessionStorage.getItem(AUTH_SESSION_KEY) === 'true' && hasLocalPassword()) {
+        document.body.classList.remove('auth-locked');
+        loadInitialData();
+        return;
+    }
+
+    document.body.classList.add('auth-locked');
+    window.setTimeout(() => authPassword.focus(), 0);
+}
+
+initAdmin();

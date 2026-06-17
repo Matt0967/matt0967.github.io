@@ -10,7 +10,39 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     </head>
-    <body>
+    <body class="auth-locked">
+        <section class="auth-screen" id="authScreen" aria-labelledby="authTitle">
+            <div class="auth-card">
+                <p class="eyebrow">Admin privé</p>
+                <h1 id="authTitle">Verrouillage dashboard</h1>
+                <p id="authHelp">Crée ou saisis le mot de passe local de ce navigateur. Sur GitHub Pages, la vraie protection de publication reste le token GitHub.</p>
+
+                <div class="field auth-confirm-field" id="authCurrentPasswordField" hidden>
+                    <label for="authCurrentPassword">Mot de passe actuel</label>
+                    <input id="authCurrentPassword" type="password" autocomplete="current-password">
+                </div>
+
+                <div class="field">
+                    <label for="authPassword">Mot de passe</label>
+                    <input id="authPassword" type="password" autocomplete="current-password">
+                </div>
+
+                <div class="field auth-confirm-field" id="authConfirmField" hidden>
+                    <label for="authConfirmPassword">Confirmer le mot de passe</label>
+                    <input id="authConfirmPassword" type="password" autocomplete="new-password">
+                </div>
+
+                <div class="auth-actions">
+                    <button class="primary-button" type="button" id="authSubmit">Déverrouiller</button>
+                    <button class="ghost-button" type="button" id="authChangePassword" hidden>Changer le mot de passe</button>
+                    <button class="ghost-button" type="button" id="authCancelChange" hidden>Annuler</button>
+                </div>
+
+                <p class="auth-error" id="authError" role="alert"></p>
+                <p class="security-note">Le mot de passe n'est pas écrit dans le code: seul un hash PBKDF2 est gardé dans ce navigateur. Ça bloque l'interface locale, mais ça ne transforme pas GitHub Pages en espace serveur privé.</p>
+            </div>
+        </section>
+
         <header class="admin-header">
             <div>
                 <a class="back-link" href="index.html">Retour au CV</a>
@@ -21,6 +53,7 @@
                 <button class="ghost-button" type="button" id="importButton">Importer JSON</button>
                 <button class="ghost-button" type="button" id="downloadButton">Télécharger JSON</button>
                 <button class="primary-button" type="button" id="saveDraftButton">Sauver le brouillon</button>
+                <button class="ghost-button" type="button" id="lockButton">Verrouiller</button>
             </div>
         </header>
 
@@ -37,6 +70,7 @@
                     <button class="tab" type="button" data-tab="education">Formation</button>
                     <button class="tab" type="button" data-tab="languages">Langues</button>
                     <button class="tab" type="button" data-tab="contact">Contact</button>
+                    <button class="tab" type="button" data-tab="stats">Stats</button>
                     <button class="tab" type="button" data-tab="publish">Publication</button>
                 </nav>
                 <div class="meta-panel">
