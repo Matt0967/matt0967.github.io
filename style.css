@@ -787,7 +787,7 @@ html[data-visual-style="material"] .skill-category {
 /* Section */
 .section {
     padding: 6rem 2rem;
-    border-top: 1px solid var(--border);
+    border-top: 0;
     background: var(--section-bg);
     opacity: 0;
     transform: translateY(30px);
@@ -1206,7 +1206,7 @@ html[data-visual-style="material"] .skill-category {
 
 /* Contact */
 .contact-section {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 0;
 }
 
 .contact-form-card {
@@ -1263,7 +1263,7 @@ footer {
     text-align: center;
     color: var(--text-muted);
     font-size: 0.875rem;
-    border-top: 1px solid var(--border);
+    border-top: 0;
     background: linear-gradient(180deg, transparent 0%, var(--theme-sheen) 100%);
 }
 
