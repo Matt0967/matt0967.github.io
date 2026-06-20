@@ -22,6 +22,16 @@
                 </div>
                 <!-- Les contrôles globaux restent groupés pour simplifier l'UX dans la navbar. -->
                 <div class="nav-controls">
+                    <label class="visual-style-switcher" for="visualStyleSwitcher">
+                        <span class="sr-only" data-i18n="visualStyles.label">Style graphique</span>
+                        <select id="visualStyleSwitcher" class="visual-style-select" aria-label="Changer de style graphique">
+                            <option value="base" data-i18n="visualStyles.options.base">Base</option>
+                            <option value="cyber" data-i18n="visualStyles.options.cyber">Cyber 3D</option>
+                            <option value="os" data-i18n="visualStyles.options.os">Interface OS</option>
+                            <option value="liquid" data-i18n="visualStyles.options.liquid">Liquid glass</option>
+                            <option value="material" data-i18n="visualStyles.options.material">Material clean</option>
+                        </select>
+                    </label>
                     <label class="language-switcher" for="languageSwitcher">
                         <span class="sr-only">Langue</span>
                         <select id="languageSwitcher" class="language-select" aria-label="Changer de langue">
@@ -109,6 +119,10 @@
                     </a>
                     <button class="btn btn-secondary" id="printCvButton" type="button" data-i18n="cv.printLabel">Exporter le CV en PDF</button>
                 </div>
+            </div>
+            <div class="hero-visual" aria-hidden="true">
+                <canvas id="cyberDiceCanvas"></canvas>
+                <div class="hero-visual-caption">AI // JS // API // NET</div>
             </div>
             <div class="scroll-indicator"></div>
         </header>
@@ -316,5 +330,6 @@
         </footer>
 
         <script src="script.js"></script>
+        <script type="module" src="visual-style-3d.js"></script>
     </body>
 </html>

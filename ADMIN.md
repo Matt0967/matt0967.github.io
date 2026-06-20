@@ -28,6 +28,12 @@ L'onglet permet aussi de configurer un analytics public optionnel: Plausible, Um
 
 Le bouton PDF du portfolio utilise l'impression navigateur si aucune URL de PDF n'est renseignée. Dans la fenêtre d'impression, choisis `Enregistrer en PDF`. Si tu préfères un fichier PDF fixe, ajoute son URL dans l'onglet `Publication`.
 
+## Styles graphiques
+
+Le portfolio garde son style de base par défaut. Le menu `Style graphique` dans la barre du haut permet aussi de tester `Cyber 3D`, `Interface OS`, `Liquid glass` et `Material clean`. Le choix est sauvegardé dans le navigateur avec `localStorage`.
+
+Le style `Cyber 3D` génère un cube 3D directement dans le navigateur avec Three.js, sans modèle 3D externe. Si la librairie distante ne charge pas, le portfolio reste utilisable et masque simplement la zone 3D.
+
 ## Mini terminal et easter eggs
 
 Le lien `Terminal` de la navigation ouvre un terminal côté navigateur dans un nouvel onglet plein écran. Les commandes utiles sont visibles via `help`; certains déclencheurs ouvrent une page cachée full screen dans un nouvel onglet. Tout reste statique et compatible GitHub Pages.

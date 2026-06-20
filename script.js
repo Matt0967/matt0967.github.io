@@ -4,6 +4,7 @@ const translations = {
             title: "Perez Matthieu // Développeur Junior // Admin Système Réseau",
             themeToggleAria: "Changer de thème",
             languageSwitcherAria: "Changer de langue",
+            visualStyleSwitcherAria: "Changer de style graphique",
             accessibilityToggleAria: "Ouvrir les réglages d'accessibilité",
             accessibilityCloseAria: "Fermer les réglages d'accessibilité"
         },
@@ -13,6 +14,16 @@ const translations = {
             skills: "Compétences",
             contact: "Contact",
             terminal: "Terminal"
+        },
+        visualStyles: {
+            label: "Style graphique",
+            options: {
+                base: "Base",
+                cyber: "Cyber 3D",
+                os: "Interface OS",
+                liquid: "Liquid glass",
+                material: "Material clean"
+            }
         },
         hero: {
             subtitle: "Développeur Junior // Administrateur Réseaux",
@@ -177,6 +188,7 @@ const translations = {
             title: "Perez Matthieu // Junior Developer // Network Systems Admin",
             themeToggleAria: "Change theme",
             languageSwitcherAria: "Change language",
+            visualStyleSwitcherAria: "Change visual style",
             accessibilityToggleAria: "Open accessibility settings",
             accessibilityCloseAria: "Close accessibility settings"
         },
@@ -186,6 +198,16 @@ const translations = {
             skills: "Skills",
             contact: "Contact",
             terminal: "Terminal"
+        },
+        visualStyles: {
+            label: "Visual style",
+            options: {
+                base: "Base",
+                cyber: "Cyber 3D",
+                os: "OS interface",
+                liquid: "Liquid glass",
+                material: "Material clean"
+            }
         },
         hero: {
             subtitle: "Junior Developer // Network Administrator",
@@ -350,6 +372,7 @@ const translations = {
             title: "Perez Matthieu // Desarrollador Junior // Admin de Redes y Sistemas",
             themeToggleAria: "Cambiar tema",
             languageSwitcherAria: "Cambiar idioma",
+            visualStyleSwitcherAria: "Cambiar estilo visual",
             accessibilityToggleAria: "Abrir ajustes de accesibilidad",
             accessibilityCloseAria: "Cerrar ajustes de accesibilidad"
         },
@@ -359,6 +382,16 @@ const translations = {
             skills: "Competencias",
             contact: "Contacto",
             terminal: "Terminal"
+        },
+        visualStyles: {
+            label: "Estilo visual",
+            options: {
+                base: "Base",
+                cyber: "Cyber 3D",
+                os: "Interfaz OS",
+                liquid: "Liquid glass",
+                material: "Material clean"
+            }
         },
         hero: {
             subtitle: "Desarrollador Junior // Administrador de redes",
@@ -816,6 +849,8 @@ async function loadPortfolioData() {
 }
 
 const ACCESSIBILITY_STORAGE_KEY = 'accessibilitySettings';
+const VISUAL_STYLE_STORAGE_KEY = 'visualStyle';
+const VISUAL_STYLE_OPTIONS = ['base', 'cyber', 'os', 'liquid', 'material'];
 const DEFAULT_ACCESSIBILITY_SETTINGS = {
     textSize: 'normal',
     highContrast: false,
@@ -832,6 +867,7 @@ function prefersReducedMotion() {
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('themeToggle');
     const languageSwitcher = document.getElementById('languageSwitcher');
+    const visualStyleSwitcher = document.getElementById('visualStyleSwitcher');
     const accessibilityMenu = document.getElementById('accessibilityMenu');
     const accessibilityToggle = document.getElementById('accessibilityToggle');
     const accessibilityPanel = document.getElementById('accessibilityPanel');
@@ -865,6 +901,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         localStorage.setItem('theme', theme);
         updateNavbarBackground();
+        window.dispatchEvent(new CustomEvent('portfolioThemeChange', {
+            detail: { theme }
+        }));
+    }
+
+    function applyVisualStyle(style) {
+        const selectedStyle = VISUAL_STYLE_OPTIONS.includes(style) ? style : 'base';
+
+        if (selectedStyle === 'base') {
+            document.documentElement.removeAttribute('data-visual-style');
+        } else {
+            document.documentElement.setAttribute('data-visual-style', selectedStyle);
+        }
+
+        if (visualStyleSwitcher) {
+            visualStyleSwitcher.value = selectedStyle;
+        }
+
+        localStorage.setItem(VISUAL_STYLE_STORAGE_KEY, selectedStyle);
+        updateNavbarBackground();
+        window.dispatchEvent(new CustomEvent('portfolioVisualStyleChange', {
+            detail: { style: selectedStyle }
+        }));
     }
 
     function readAccessibilitySettings() {
@@ -978,6 +1037,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.title = copy.meta.title;
         themeToggle.setAttribute('aria-label', copy.meta.themeToggleAria);
         languageSwitcher.setAttribute('aria-label', copy.meta.languageSwitcherAria);
+        visualStyleSwitcher?.setAttribute('aria-label', copy.meta.visualStyleSwitcherAria);
         accessibilityToggle?.setAttribute('aria-label', copy.meta.accessibilityToggleAria);
         accessibilityClose?.setAttribute('aria-label', copy.meta.accessibilityCloseAria);
 
@@ -1033,8 +1093,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const savedTheme = localStorage.getItem('theme');
     const savedLanguage = localStorage.getItem('language');
+    const savedVisualStyle = localStorage.getItem(VISUAL_STYLE_STORAGE_KEY);
 
     applyTheme(savedTheme === 'color' ? 'color' : 'dark');
+    applyVisualStyle(savedVisualStyle || 'base');
     applyAccessibility(accessibilitySettings, false);
     applyLanguage(savedLanguage || 'fr');
     loadPortfolioData().then(() => {
@@ -1048,6 +1110,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     languageSwitcher.addEventListener('change', (event) => {
         applyLanguage(event.target.value);
+    });
+
+    visualStyleSwitcher?.addEventListener('change', (event) => {
+        applyVisualStyle(event.target.value);
     });
 
     printCvButton?.addEventListener('click', () => {
