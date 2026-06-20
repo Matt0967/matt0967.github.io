@@ -19,8 +19,6 @@ const translations = {
             label: "Style graphique",
             options: {
                 base: "Base",
-                cyber: "Cyber 3D",
-                os: "Interface OS",
                 liquid: "Liquid glass",
                 material: "Material clean"
             }
@@ -203,8 +201,6 @@ const translations = {
             label: "Visual style",
             options: {
                 base: "Base",
-                cyber: "Cyber 3D",
-                os: "OS interface",
                 liquid: "Liquid glass",
                 material: "Material clean"
             }
@@ -387,8 +383,6 @@ const translations = {
             label: "Estilo visual",
             options: {
                 base: "Base",
-                cyber: "Cyber 3D",
-                os: "Interfaz OS",
                 liquid: "Liquid glass",
                 material: "Material clean"
             }
@@ -850,7 +844,7 @@ async function loadPortfolioData() {
 
 const ACCESSIBILITY_STORAGE_KEY = 'accessibilitySettings';
 const VISUAL_STYLE_STORAGE_KEY = 'visualStyle';
-const VISUAL_STYLE_OPTIONS = ['base', 'cyber', 'os', 'liquid', 'material'];
+const VISUAL_STYLE_OPTIONS = ['base', 'liquid', 'material'];
 const DEFAULT_ACCESSIBILITY_SETTINGS = {
     textSize: 'normal',
     highContrast: false,

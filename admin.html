@@ -50,6 +50,13 @@
                 <p>Édition statique compatible GitHub Pages. La publication demande un token GitHub personnel.</p>
             </div>
             <div class="header-actions">
+                <label class="admin-style-control" for="adminStyleSwitcher">
+                    <span>Style admin</span>
+                    <select id="adminStyleSwitcher" aria-label="Changer le style du dashboard admin">
+                        <option value="cyber">Cyber admin</option>
+                        <option value="os">Interface OS</option>
+                    </select>
+                </label>
                 <button class="ghost-button" type="button" id="importButton">Importer JSON</button>
                 <button class="ghost-button" type="button" id="downloadButton">Télécharger JSON</button>
                 <button class="primary-button" type="button" id="saveDraftButton">Sauver le brouillon</button>
@@ -63,15 +70,22 @@
                     <span class="status-dot" id="statusDot"></span>
                     <span id="statusText">Chargement des données...</span>
                 </div>
+                <nav class="admin-pages" aria-label="Pages du dashboard">
+                    <button class="page-tab is-active" type="button" data-page="content">Contenu</button>
+                    <button class="page-tab" type="button" data-page="site">Site</button>
+                    <button class="page-tab" type="button" data-page="automation">IA</button>
+                    <button class="page-tab" type="button" data-page="publish">Publication</button>
+                </nav>
                 <nav class="tabs" aria-label="Sections du dashboard">
-                    <button class="tab is-active" type="button" data-tab="projects">Projets</button>
-                    <button class="tab" type="button" data-tab="skills">Compétences</button>
-                    <button class="tab" type="button" data-tab="interests">Intérêts</button>
-                    <button class="tab" type="button" data-tab="education">Formation</button>
-                    <button class="tab" type="button" data-tab="languages">Langues</button>
-                    <button class="tab" type="button" data-tab="contact">Contact</button>
-                    <button class="tab" type="button" data-tab="stats">Stats</button>
-                    <button class="tab" type="button" data-tab="publish">Publication</button>
+                    <button class="tab is-active" type="button" data-tab="projects" data-page="content">Projets</button>
+                    <button class="tab" type="button" data-tab="skills" data-page="content">Compétences</button>
+                    <button class="tab" type="button" data-tab="interests" data-page="content">Intérêts</button>
+                    <button class="tab" type="button" data-tab="education" data-page="content">Formation</button>
+                    <button class="tab" type="button" data-tab="languages" data-page="content">Langues</button>
+                    <button class="tab" type="button" data-tab="contact" data-page="site">Contact</button>
+                    <button class="tab" type="button" data-tab="stats" data-page="site">Stats</button>
+                    <button class="tab" type="button" data-tab="ai" data-page="automation">Traduction IA</button>
+                    <button class="tab" type="button" data-tab="publish" data-page="publish">Publication</button>
                 </nav>
                 <div class="meta-panel">
                     <span><strong id="projectCount">0</strong> projets</span>

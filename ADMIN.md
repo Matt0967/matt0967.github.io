@@ -30,9 +30,18 @@ Le bouton PDF du portfolio utilise l'impression navigateur si aucune URL de PDF 
 
 ## Styles graphiques
 
-Le portfolio garde son style de base par défaut. Le menu `Style graphique` dans la barre du haut permet aussi de tester `Cyber 3D`, `Interface OS`, `Liquid glass` et `Material clean`. Le choix est sauvegardé dans le navigateur avec `localStorage`.
+Le portfolio garde son style de base par défaut. Le menu `Style graphique` dans la barre du haut permet aussi de tester `Liquid glass` et `Material clean`. Le choix est sauvegardé dans le navigateur avec `localStorage`.
 
-Le style `Cyber 3D` génère un cube 3D directement dans le navigateur avec Three.js, sans modèle 3D externe. Si la librairie distante ne charge pas, le portfolio reste utilisable et masque simplement la zone 3D.
+Les styles plus expérimentaux `Cyber admin` et `Interface OS` sont maintenant réservés au dashboard admin via le menu `Style admin`.
+
+## Traduction IA
+
+L'onglet `Traduction IA` du dashboard peut préparer les traductions des champs localisés du portfolio. Deux modes existent:
+
+- Mode gratuit: copie un prompt JSON, colle-le dans une interface IA gratuite, puis colle la réponse JSON dans le dashboard.
+- Mode API: utilise une clé OpenAI ou Gemini saisie dans le navigateur.
+
+Ne commit jamais une clé API. Par défaut, la clé reste dans la session du navigateur; l'option `Garder la clé` la stocke dans `localStorage`, ce qui est pratique mais moins prudent.
 
 ## Mini terminal et easter eggs
 
