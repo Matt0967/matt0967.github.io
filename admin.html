@@ -47,16 +47,9 @@
             <div>
                 <a class="back-link" href="index.html">Retour au CV</a>
                 <h1>Dashboard admin</h1>
-                <p>Édition statique compatible GitHub Pages. La publication demande un token GitHub personnel.</p>
+                <p>Deux espaces seulement: le contenu du portfolio et les outils de publication, stats et IA.</p>
             </div>
             <div class="header-actions">
-                <label class="admin-style-control" for="adminStyleSwitcher">
-                    <span>Style admin</span>
-                    <select id="adminStyleSwitcher" aria-label="Changer le style du dashboard admin">
-                        <option value="cyber">Cyber admin</option>
-                        <option value="os">Interface OS</option>
-                    </select>
-                </label>
                 <button class="ghost-button" type="button" id="importButton">Importer JSON</button>
                 <button class="ghost-button" type="button" id="downloadButton">Télécharger JSON</button>
                 <button class="primary-button" type="button" id="saveDraftButton">Sauver le brouillon</button>
@@ -72,9 +65,7 @@
                 </div>
                 <nav class="admin-pages" aria-label="Pages du dashboard">
                     <button class="page-tab is-active" type="button" data-page="content">Contenu</button>
-                    <button class="page-tab" type="button" data-page="site">Site</button>
-                    <button class="page-tab" type="button" data-page="automation">IA</button>
-                    <button class="page-tab" type="button" data-page="publish">Publication</button>
+                    <button class="page-tab" type="button" data-page="tools">Outils</button>
                 </nav>
                 <nav class="tabs" aria-label="Sections du dashboard">
                     <button class="tab is-active" type="button" data-tab="projects" data-page="content">Projets</button>
@@ -82,10 +73,10 @@
                     <button class="tab" type="button" data-tab="interests" data-page="content">Intérêts</button>
                     <button class="tab" type="button" data-tab="education" data-page="content">Formation</button>
                     <button class="tab" type="button" data-tab="languages" data-page="content">Langues</button>
-                    <button class="tab" type="button" data-tab="contact" data-page="site">Contact</button>
-                    <button class="tab" type="button" data-tab="stats" data-page="site">Stats</button>
-                    <button class="tab" type="button" data-tab="ai" data-page="automation">Traduction IA</button>
-                    <button class="tab" type="button" data-tab="publish" data-page="publish">Publication</button>
+                    <button class="tab" type="button" data-tab="contact" data-page="content">Contact</button>
+                    <button class="tab" type="button" data-tab="ai" data-page="tools">IA & traduction</button>
+                    <button class="tab" type="button" data-tab="publish" data-page="tools">Publication</button>
+                    <button class="tab" type="button" data-tab="stats" data-page="tools">Stats</button>
                 </nav>
                 <div class="meta-panel">
                     <span><strong id="projectCount">0</strong> projets</span>

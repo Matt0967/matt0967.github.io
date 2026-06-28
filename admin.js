@@ -2,7 +2,6 @@ const DATA_PATH = 'portfolio-data.json';
 const DRAFT_KEY = 'portfolio-admin-draft';
 const GITHUB_CONFIG_KEY = 'portfolio-admin-github-config';
 const GITHUB_TOKEN_KEY = 'portfolio-admin-github-token';
-const ADMIN_STYLE_KEY = 'portfolio-admin-style';
 const AI_CONFIG_KEY = 'portfolio-admin-ai-config';
 const AI_LOCAL_KEY = 'portfolio-admin-ai-key';
 const AI_SESSION_KEY = 'portfolio-admin-ai-session-key';
@@ -10,11 +9,20 @@ const AUTH_HASH_KEY = 'portfolio-admin-password-hash';
 const AUTH_SALT_KEY = 'portfolio-admin-password-salt';
 const AUTH_SESSION_KEY = 'portfolio-admin-session-unlocked';
 const LOCALES = ['fr', 'en', 'es'];
+const DEFAULT_AI_CONFIG = {
+    provider: 'manual',
+    openaiModel: 'gpt-4o-mini',
+    geminiModel: 'gemini-1.5-flash',
+    anthropicModel: 'claude-3-5-haiku-latest',
+    customModel: 'gpt-4o-mini',
+    customEndpoint: '',
+    sourceLocale: 'fr',
+    targetLocales: ['en', 'es'],
+    rememberKey: false
+};
 const ADMIN_PAGES = {
-    content: ['projects', 'skills', 'interests', 'education', 'languages'],
-    site: ['contact', 'stats'],
-    automation: ['ai'],
-    publish: ['publish']
+    content: ['projects', 'skills', 'interests', 'education', 'languages', 'contact'],
+    tools: ['ai', 'publish', 'stats']
 };
 const PBKDF2_ITERATIONS = 210000;
 
@@ -44,7 +52,6 @@ const authCancelChange = document.getElementById('authCancelChange');
 const authError = document.getElementById('authError');
 const authHelp = document.getElementById('authHelp');
 const lockButton = document.getElementById('lockButton');
-const adminStyleSwitcher = document.getElementById('adminStyleSwitcher');
 let authMode = localStorage.getItem(AUTH_HASH_KEY) ? 'unlock' : 'setup';
 
 function emptyLocalizedValue() {
@@ -156,16 +163,6 @@ function createId(prefix) {
 
 function getPageForTab(tabName) {
     return Object.entries(ADMIN_PAGES).find(([, tabs]) => tabs.includes(tabName))?.[0] || 'content';
-}
-
-function setAdminStyle(style) {
-    const nextStyle = style === 'os' ? 'os' : 'cyber';
-    document.documentElement.setAttribute('data-admin-style', nextStyle);
-    localStorage.setItem(ADMIN_STYLE_KEY, nextStyle);
-
-    if (adminStyleSwitcher) {
-        adminStyleSwitcher.value = nextStyle;
-    }
 }
 
 function setActivePage(pageName) {
@@ -937,23 +934,11 @@ function renderStats() {
 function getAiConfig() {
     try {
         return {
-            provider: 'manual',
-            openaiModel: 'gpt-5.4-mini',
-            geminiModel: 'gemini-3.5-flash',
-            sourceLocale: 'fr',
-            targetLocales: ['en', 'es'],
-            rememberKey: false,
+            ...DEFAULT_AI_CONFIG,
             ...JSON.parse(localStorage.getItem(AI_CONFIG_KEY) || '{}')
         };
     } catch (error) {
-        return {
-            provider: 'manual',
-            openaiModel: 'gpt-5.4-mini',
-            geminiModel: 'gemini-3.5-flash',
-            sourceLocale: 'fr',
-            targetLocales: ['en', 'es'],
-            rememberKey: false
-        };
+        return { ...DEFAULT_AI_CONFIG };
     }
 }
 
@@ -962,6 +947,9 @@ function saveAiConfig(config, apiKey) {
         provider: config.provider,
         openaiModel: config.openaiModel,
         geminiModel: config.geminiModel,
+        anthropicModel: config.anthropicModel,
+        customModel: config.customModel,
+        customEndpoint: config.customEndpoint,
         sourceLocale: config.sourceLocale,
         targetLocales: config.targetLocales,
         rememberKey: config.rememberKey
@@ -1072,6 +1060,17 @@ function extractOpenAiText(payload) {
         .join('\n');
 }
 
+function extractAnthropicText(payload) {
+    return (payload.content || [])
+        .map((part) => part.text || '')
+        .filter(Boolean)
+        .join('\n');
+}
+
+function extractChatCompletionText(payload) {
+    return payload.choices?.[0]?.message?.content || payload.choices?.[0]?.text || '';
+}
+
 function parseTranslationResponse(text) {
     const cleaned = text.trim()
         .replace(/^```json\s*/i, '')
@@ -1087,7 +1086,7 @@ function parseTranslationResponse(text) {
     return translations;
 }
 
-async function translateWithOpenAI(config, apiKey, items) {
+async function generateWithOpenAI(config, apiKey, prompt) {
     const response = await fetch('https://api.openai.com/v1/responses', {
         method: 'POST',
         headers: {
@@ -1095,8 +1094,8 @@ async function translateWithOpenAI(config, apiKey, items) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            model: config.openaiModel || 'gpt-5.4-mini',
-            input: createTranslationPrompt(items),
+            model: config.openaiModel || DEFAULT_AI_CONFIG.openaiModel,
+            input: prompt,
             temperature: 0
         })
     });
@@ -1105,11 +1104,11 @@ async function translateWithOpenAI(config, apiKey, items) {
         throw new Error(`OpenAI a refusé la demande (${response.status}). Vérifie la clé, le modèle et les permissions.`);
     }
 
-    return parseTranslationResponse(extractOpenAiText(await response.json()));
+    return extractOpenAiText(await response.json());
 }
 
-async function translateWithGemini(config, apiKey, items) {
-    const model = encodeURIComponent(config.geminiModel || 'gemini-3.5-flash');
+async function generateWithGemini(config, apiKey, prompt, options = {}) {
+    const model = encodeURIComponent(config.geminiModel || DEFAULT_AI_CONFIG.geminiModel);
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
         method: 'POST',
         headers: {
@@ -1120,12 +1119,12 @@ async function translateWithGemini(config, apiKey, items) {
             contents: [
                 {
                     parts: [
-                        { text: createTranslationPrompt(items) }
+                        { text: prompt }
                     ]
                 }
             ],
             generationConfig: {
-                responseMimeType: 'application/json',
+                ...(options.json ? { responseMimeType: 'application/json' } : {}),
                 temperature: 0
             }
         })
@@ -1136,12 +1135,93 @@ async function translateWithGemini(config, apiKey, items) {
     }
 
     const payload = await response.json();
-    const text = (payload.candidates?.[0]?.content?.parts || [])
+    return (payload.candidates?.[0]?.content?.parts || [])
         .map((part) => part.text || '')
         .filter(Boolean)
         .join('\n');
+}
 
-    return parseTranslationResponse(text);
+async function generateWithAnthropic(config, apiKey, prompt) {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: config.anthropicModel || DEFAULT_AI_CONFIG.anthropicModel,
+            max_tokens: 4096,
+            temperature: 0,
+            messages: [
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ]
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Anthropic a refusé la demande (${response.status}). Vérifie la clé, le modèle et les permissions.`);
+    }
+
+    return extractAnthropicText(await response.json());
+}
+
+async function generateWithCustomEndpoint(config, apiKey, prompt) {
+    const endpoint = (config.customEndpoint || '').trim();
+
+    if (!endpoint) {
+        throw new Error('Ajoute une URL complète pour l’endpoint compatible OpenAI.');
+    }
+
+    const headers = { 'Content-Type': 'application/json' };
+
+    if (apiKey) {
+        headers.Authorization = `Bearer ${apiKey}`;
+    }
+
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+            model: config.customModel || DEFAULT_AI_CONFIG.customModel,
+            temperature: 0,
+            messages: [
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ]
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Endpoint compatible OpenAI refusé (${response.status}). Vérifie l’URL, la clé et le CORS.`);
+    }
+
+    return extractChatCompletionText(await response.json());
+}
+
+async function generateAiText(config, apiKey, prompt, options = {}) {
+    if (config.provider === 'openai') {
+        return generateWithOpenAI(config, apiKey, prompt);
+    }
+
+    if (config.provider === 'gemini') {
+        return generateWithGemini(config, apiKey, prompt, options);
+    }
+
+    if (config.provider === 'anthropic') {
+        return generateWithAnthropic(config, apiKey, prompt);
+    }
+
+    if (config.provider === 'custom') {
+        return generateWithCustomEndpoint(config, apiKey, prompt);
+    }
+
+    throw new Error('Sélectionne un fournisseur IA direct ou utilise le mode gratuit par prompt.');
 }
 
 function applyTranslationResults(items, translations) {
@@ -1169,8 +1249,11 @@ function readAiFormConfig() {
 
     return {
         provider: document.getElementById('aiProvider')?.value || 'manual',
-        openaiModel: document.getElementById('aiOpenAIModel')?.value.trim() || 'gpt-5.4-mini',
-        geminiModel: document.getElementById('aiGeminiModel')?.value.trim() || 'gemini-3.5-flash',
+        openaiModel: document.getElementById('aiOpenAIModel')?.value.trim() || DEFAULT_AI_CONFIG.openaiModel,
+        geminiModel: document.getElementById('aiGeminiModel')?.value.trim() || DEFAULT_AI_CONFIG.geminiModel,
+        anthropicModel: document.getElementById('aiAnthropicModel')?.value.trim() || DEFAULT_AI_CONFIG.anthropicModel,
+        customModel: document.getElementById('aiCustomModel')?.value.trim() || DEFAULT_AI_CONFIG.customModel,
+        customEndpoint: document.getElementById('aiCustomEndpoint')?.value.trim() || '',
         sourceLocale: document.getElementById('aiSourceLocale')?.value || 'fr',
         targetLocales: targetLocales.length ? targetLocales : ['en', 'es'],
         rememberKey: Boolean(document.getElementById('aiRememberKey')?.checked),
@@ -1213,6 +1296,67 @@ async function copyManualTranslationPrompt() {
     }
 }
 
+function createWritingPrompt(instruction, sourceText, locale) {
+    return [
+        'Tu es un assistant de rédaction pour un portfolio professionnel de développeur junior et administrateur réseaux.',
+        `Langue demandée: ${locale.toUpperCase()}.`,
+        'Écris un texte clair, crédible, professionnel, sans exagérer le niveau.',
+        'Garde les termes techniques exacts quand ils sont utiles.',
+        'Retourne uniquement le texte final, sans guillemets, sans markdown, sans explication.',
+        '',
+        `Objectif: ${instruction || 'améliorer le texte fourni'}`,
+        '',
+        'Texte de départ:',
+        sourceText || '(aucun texte fourni)'
+    ].join('\n');
+}
+
+function setWritingOutput(message) {
+    const output = document.getElementById('aiWritingOutput');
+
+    if (output) {
+        output.value = message;
+    }
+}
+
+async function runWritingAssistant() {
+    const config = readAiFormConfig();
+    const apiKey = document.getElementById('aiApiKey')?.value.trim() || getSavedAiKey();
+    const instruction = document.getElementById('aiWritingInstruction')?.value.trim() || '';
+    const sourceText = document.getElementById('aiWritingSource')?.value.trim() || '';
+    const locale = document.getElementById('aiWritingLocale')?.value || config.sourceLocale || 'fr';
+    const prompt = createWritingPrompt(instruction, sourceText, locale);
+
+    saveAiConfig(config, apiKey);
+
+    if (config.provider === 'manual') {
+        try {
+            await navigator.clipboard.writeText(prompt);
+            setWritingOutput('Prompt de rédaction copié. Colle-le dans une IA gratuite, puis récupère le texte obtenu.');
+            setStatus('Prompt de rédaction copié.', 'ready');
+        } catch (error) {
+            setWritingOutput(`Copie impossible: ${error.message}`);
+            setStatus('Copie du prompt impossible.', 'error');
+        }
+        return;
+    }
+
+    if (!apiKey && config.provider !== 'custom') {
+        setWritingOutput('Ajoute une clé API ou passe en mode gratuit par prompt.');
+        return;
+    }
+
+    try {
+        setWritingOutput('Rédaction en cours...');
+        const text = await generateAiText(config, apiKey, prompt);
+        setWritingOutput(text.trim());
+        setStatus('Texte généré.', 'ready');
+    } catch (error) {
+        setWritingOutput(`${error.message}\n\nSi le navigateur bloque la requête, utilise le mode gratuit par prompt.`);
+        setStatus('Rédaction IA impossible.', 'error');
+    }
+}
+
 async function runDirectAiTranslation() {
     const { apiKey, config, items } = getAiTranslationContext();
 
@@ -1226,17 +1370,16 @@ async function runDirectAiTranslation() {
         return;
     }
 
-    if (!apiKey) {
+    if (!apiKey && config.provider !== 'custom') {
         setAiOutput('Ajoute une clé API ou utilise le mode gratuit avec prompt à copier.');
         return;
     }
 
     try {
         setAiOutput(`Traduction en cours: ${items.length} élément(s)...`);
-        const translations = config.provider === 'gemini'
-            ? await translateWithGemini(config, apiKey, items)
-            : await translateWithOpenAI(config, apiKey, items);
-        state.activePage = 'automation';
+        const translatedText = await generateAiText(config, apiKey, createTranslationPrompt(items), { json: true });
+        const translations = parseTranslationResponse(translatedText);
+        state.activePage = 'tools';
         state.activeTab = 'ai';
         const applied = applyTranslationResults(items, translations);
         render();
@@ -1259,7 +1402,7 @@ function applyPastedTranslations() {
         }
 
         const translations = parseTranslationResponse(pasted);
-        state.activePage = 'automation';
+        state.activePage = 'tools';
         state.activeTab = 'ai';
         const applied = applyTranslationResults(items, translations);
         render();
@@ -1273,7 +1416,7 @@ function applyPastedTranslations() {
 
 function renderAITranslation() {
     const config = getAiConfig();
-    tabEyebrow.textContent = 'Automatisation';
+    tabEyebrow.textContent = 'Outils';
     tabTitle.textContent = 'Traduction IA';
     addButton.hidden = true;
     editor.replaceChildren();
@@ -1281,9 +1424,9 @@ function renderAITranslation() {
     const panel = document.createElement('section');
     panel.className = 'publish-panel';
     panel.innerHTML = `
-        <p class="ai-warning">Ne mets jamais une clé API dans <code>portfolio-data.json</code> ou dans un commit. Ici, la clé reste seulement dans ton navigateur. Le stockage local est pratique, mais le mode session est plus prudent.</p>
+        <p class="ai-warning">Ne mets jamais une clé API dans <code>portfolio-data.json</code> ou dans un commit. Ici, la clé reste seulement dans ton navigateur. Le mode session est le plus prudent.</p>
         <div class="admin-card-grid">
-            <div class="admin-mini-card"><strong>Direct</strong><span>OpenAI ou Gemini traduit et applique les champs.</span></div>
+            <div class="admin-mini-card"><strong>Direct</strong><span>OpenAI, Gemini, Anthropic ou endpoint compatible OpenAI.</span></div>
             <div class="admin-mini-card"><strong>Gratuit</strong><span>Copie un prompt, utilise une interface gratuite, puis colle le JSON.</span></div>
             <div class="admin-mini-card"><strong>Statique</strong><span>Aucun backend ajouté, compatible GitHub Pages.</span></div>
         </div>
@@ -1296,6 +1439,8 @@ function renderAITranslation() {
                         <option value="manual">Gratuit: prompt à copier</option>
                         <option value="openai">OpenAI API</option>
                         <option value="gemini">Gemini API</option>
+                        <option value="anthropic">Anthropic API</option>
+                        <option value="custom">Endpoint compatible OpenAI</option>
                     </select>
                 </div>
                 <div class="field">
@@ -1314,19 +1459,31 @@ function renderAITranslation() {
                         <label><input type="checkbox" data-ai-target-locale="es"> ES</label>
                     </div>
                 </div>
-                <div class="field">
+                <div class="field ai-provider-field" data-ai-provider-field="openai">
                     <label for="aiOpenAIModel">Modèle OpenAI</label>
-                    <input id="aiOpenAIModel" placeholder="gpt-5.4-mini">
+                    <input id="aiOpenAIModel" placeholder="gpt-4o-mini">
                 </div>
-                <div class="field">
+                <div class="field ai-provider-field" data-ai-provider-field="gemini">
                     <label for="aiGeminiModel">Modèle Gemini</label>
-                    <input id="aiGeminiModel" placeholder="gemini-3.5-flash">
+                    <input id="aiGeminiModel" placeholder="gemini-1.5-flash">
                 </div>
-                <div class="field">
+                <div class="field ai-provider-field" data-ai-provider-field="anthropic">
+                    <label for="aiAnthropicModel">Modèle Anthropic</label>
+                    <input id="aiAnthropicModel" placeholder="claude-3-5-haiku-latest">
+                </div>
+                <div class="field ai-provider-field" data-ai-provider-field="custom">
+                    <label for="aiCustomModel">Modèle endpoint compatible</label>
+                    <input id="aiCustomModel" placeholder="gpt-4o-mini">
+                </div>
+                <div class="field full ai-provider-field" data-ai-provider-field="custom">
+                    <label for="aiCustomEndpoint">URL endpoint compatible OpenAI</label>
+                    <input id="aiCustomEndpoint" type="url" placeholder="https://exemple.com/v1/chat/completions">
+                </div>
+                <div class="field full ai-api-field">
                     <label for="aiApiKey">Clé API</label>
-                    <input id="aiApiKey" type="password" autocomplete="off" placeholder="Coller une clé pour OpenAI ou Gemini">
+                    <input id="aiApiKey" type="password" autocomplete="off" placeholder="Coller une clé API uniquement si tu utilises un fournisseur direct">
                 </div>
-                <label class="checkbox-row field full">
+                <label class="checkbox-row field full ai-api-field">
                     <input id="aiRememberKey" type="checkbox">
                     Garder la clé dans ce navigateur
                 </label>
@@ -1342,6 +1499,32 @@ function renderAITranslation() {
             <button class="ghost-button" type="button" id="clearAiKey">Effacer la clé locale</button>
         </div>
         <div class="settings-block">
+            <h3>Rédaction assistée</h3>
+            <div class="field-grid">
+                <div class="field">
+                    <label for="aiWritingLocale">Langue du texte</label>
+                    <select id="aiWritingLocale">
+                        <option value="fr">Français</option>
+                        <option value="en">Anglais</option>
+                        <option value="es">Espagnol</option>
+                    </select>
+                </div>
+                <div class="field full">
+                    <label for="aiWritingInstruction">Ce que l’IA doit écrire ou améliorer</label>
+                    <input id="aiWritingInstruction" placeholder="Ex: améliorer mon texte À propos en restant simple et professionnel">
+                </div>
+                <div class="field full">
+                    <label for="aiWritingSource">Texte de départ optionnel</label>
+                    <textarea id="aiWritingSource" placeholder="Colle ici un brouillon à améliorer, ou laisse vide pour générer depuis l’objectif."></textarea>
+                </div>
+                <div class="field full">
+                    <label for="aiWritingOutput">Résultat</label>
+                    <textarea id="aiWritingOutput" readonly placeholder="Le texte généré apparaîtra ici."></textarea>
+                </div>
+            </div>
+            <button class="secondary-button" type="button" id="runAiWriting">Générer / copier le prompt</button>
+        </div>
+        <div class="settings-block">
             <h3>Importer une réponse gratuite</h3>
             <div class="field">
                 <label for="aiPasteJson">JSON retourné par l’IA</label>
@@ -1354,8 +1537,11 @@ function renderAITranslation() {
 
     panel.querySelector('#aiProvider').value = config.provider || 'manual';
     panel.querySelector('#aiSourceLocale').value = config.sourceLocale || 'fr';
-    panel.querySelector('#aiOpenAIModel').value = config.openaiModel || 'gpt-5.4-mini';
-    panel.querySelector('#aiGeminiModel').value = config.geminiModel || 'gemini-3.5-flash';
+    panel.querySelector('#aiOpenAIModel').value = config.openaiModel || DEFAULT_AI_CONFIG.openaiModel;
+    panel.querySelector('#aiGeminiModel').value = config.geminiModel || DEFAULT_AI_CONFIG.geminiModel;
+    panel.querySelector('#aiAnthropicModel').value = config.anthropicModel || DEFAULT_AI_CONFIG.anthropicModel;
+    panel.querySelector('#aiCustomModel').value = config.customModel || DEFAULT_AI_CONFIG.customModel;
+    panel.querySelector('#aiCustomEndpoint').value = config.customEndpoint || '';
     panel.querySelector('#aiApiKey').value = getSavedAiKey();
     panel.querySelector('#aiRememberKey').checked = Boolean(config.rememberKey && localStorage.getItem(AI_LOCAL_KEY));
     (config.targetLocales || ['en', 'es']).forEach((locale) => {
@@ -1365,8 +1551,21 @@ function renderAITranslation() {
         }
     });
 
+    function updateProviderFields() {
+        const selectedProvider = panel.querySelector('#aiProvider').value;
+        panel.querySelectorAll('[data-ai-provider-field]').forEach((field) => {
+            field.hidden = field.dataset.aiProviderField !== selectedProvider;
+        });
+        panel.querySelectorAll('.ai-api-field').forEach((field) => {
+            field.hidden = selectedProvider === 'manual';
+        });
+    }
+
+    updateProviderFields();
+    panel.querySelector('#aiProvider').addEventListener('change', updateProviderFields);
     panel.querySelector('#copyTranslationPrompt').addEventListener('click', copyManualTranslationPrompt);
     panel.querySelector('#runAiTranslation').addEventListener('click', runDirectAiTranslation);
+    panel.querySelector('#runAiWriting').addEventListener('click', runWritingAssistant);
     panel.querySelector('#applyPastedTranslations').addEventListener('click', applyPastedTranslations);
     panel.querySelector('#clearAiKey').addEventListener('click', () => {
         localStorage.removeItem(AI_LOCAL_KEY);
@@ -1984,10 +2183,6 @@ authCancelChange.addEventListener('click', () => {
     authPassword.focus();
 });
 lockButton.addEventListener('click', lockDashboard);
-adminStyleSwitcher?.addEventListener('change', (event) => {
-    setAdminStyle(event.target.value);
-});
-
 addButton.addEventListener('click', addCurrentItem);
 document.getElementById('saveDraftButton').addEventListener('click', saveDraft);
 document.getElementById('downloadButton').addEventListener('click', downloadJson);
@@ -2001,7 +2196,6 @@ jsonFileInput.addEventListener('change', (event) => {
 });
 
 function initAdmin() {
-    setAdminStyle(localStorage.getItem(ADMIN_STYLE_KEY) || 'cyber');
     updateAuthScreen();
 
     if (sessionStorage.getItem(AUTH_SESSION_KEY) === 'true' && hasLocalPassword()) {
